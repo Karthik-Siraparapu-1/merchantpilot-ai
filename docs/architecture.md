@@ -110,11 +110,11 @@ flowchart TB
 
 ## Clean Architecture layers
 
-| Layer | Responsibility | Dependency rule |
-|---|---|---|
-| Domain | Entities, value objects, invariants, domain events | Depends on nothing outside domain |
-| Application | Use cases, transaction boundaries, ports, authorization decisions | Depends on domain abstractions |
-| Interface | REST controllers, DTO mapping, web views, webhooks | Depends inward on application contracts |
-| Infrastructure | PostgreSQL, Redis, queue, LLM, Razorpay adapters | Implements ports; never defines business policy |
+| Layer          | Responsibility                                                    | Dependency rule                                 |
+| -------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
+| Domain         | Entities, value objects, invariants, domain events                | Depends on nothing outside domain               |
+| Application    | Use cases, transaction boundaries, ports, authorization decisions | Depends on domain abstractions                  |
+| Interface      | REST controllers, DTO mapping, web views, webhooks                | Depends inward on application contracts         |
+| Infrastructure | PostgreSQL, Redis, queue, LLM, Razorpay adapters                  | Implements ports; never defines business policy |
 
 Tenant ID, actor identity, correlation ID, idempotency key, and authorization context are explicit at every boundary. Background jobs propagate them in metadata.

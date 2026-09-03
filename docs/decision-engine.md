@@ -22,15 +22,15 @@ flowchart TD
 
 ## Inputs and authoritative sources
 
-| Input | Source | Authority |
-|---|---|---|
-| Intent and explicit constraints | Conversation agent | Advisory; customer statements remain authoritative |
-| Product metadata and compatibility | Published catalog | Authoritative product facts |
-| Price and currency | Variant pricing service | Authoritative at response and checkout time |
-| Stock | Inventory balance | Authoritative at response and rechecked at checkout |
-| Margin and inventory goal | Merchant policy/configuration | Internal bounded scoring signal |
-| Offer eligibility | Offer/policy engine | Deterministic authority |
-| Experiment variant | Assignment service | Deterministic stable assignment |
+| Input                              | Source                        | Authority                                           |
+| ---------------------------------- | ----------------------------- | --------------------------------------------------- |
+| Intent and explicit constraints    | Conversation agent            | Advisory; customer statements remain authoritative  |
+| Product metadata and compatibility | Published catalog             | Authoritative product facts                         |
+| Price and currency                 | Variant pricing service       | Authoritative at response and checkout time         |
+| Stock                              | Inventory balance             | Authoritative at response and rechecked at checkout |
+| Margin and inventory goal          | Merchant policy/configuration | Internal bounded scoring signal                     |
+| Offer eligibility                  | Offer/policy engine           | Deterministic authority                             |
+| Experiment variant                 | Assignment service            | Deterministic stable assignment                     |
 
 ## Hard eligibility rules
 
@@ -44,12 +44,12 @@ The engine calculates a transparent score per remaining candidate. All terms are
 
 `relevance_gate` is zero when hard eligibility fails. Otherwise it reflects semantic/use-case, attribute, and budget fit.
 
-| Component | Definition | Constraint |
-|---|---|---|
-| Conversion likelihood | Calibrated estimate of click/add-to-cart propensity from current intent-candidate fit | No protected attributes; no cross-merchant customer profiling |
-| Merchant margin score | Normalized merchant-configured margin band | Not shown as a customer benefit and cannot defeat relevance |
-| Inventory priority | Merchant-set priority for eligible stock | Cannot select unavailable stock or force urgency claims |
-| Merchant goal alignment | Match to conversion, AOV, premium adoption, or stock reduction goal | Goal must be explicit, time-bounded, and auditable |
+| Component               | Definition                                                                            | Constraint                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Conversion likelihood   | Calibrated estimate of click/add-to-cart propensity from current intent-candidate fit | No protected attributes; no cross-merchant customer profiling |
+| Merchant margin score   | Normalized merchant-configured margin band                                            | Not shown as a customer benefit and cannot defeat relevance   |
+| Inventory priority      | Merchant-set priority for eligible stock                                              | Cannot select unavailable stock or force urgency claims       |
+| Merchant goal alignment | Match to conversion, AOV, premium adoption, or stock reduction goal                   | Goal must be explicit, time-bounded, and auditable            |
 
 Default weights are `0.40/0.30/0.20/0.10`. Policy limits each to 0–0.50 and requires total 1.00. Missing components are renormalized and recorded. No revenue estimate exists without configured calibration.
 
@@ -59,13 +59,13 @@ Offers are evaluated after the base recommendation qualifies. A bundle must be c
 
 ## Outputs and invariants
 
-| Outcome | Required behavior |
-|---|---|
+| Outcome                  | Required behavior                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
 | Qualified recommendation | Policy-capped items, rank, reason codes, evidence, confidence, score breakdown, decision ID |
-| Qualified upsell | Optional offer/bundle, eligibility evidence, basket delta if calculable, decision ID |
-| Clarification | Focused question for missing high-impact information |
-| No match | Honest no-match plus deterministic browse/filter path |
-| Suppression | Do not display invalid/blocked output; persist reason and fallback state |
+| Qualified upsell         | Optional offer/bundle, eligibility evidence, basket delta if calculable, decision ID        |
+| Clarification            | Focused question for missing high-impact information                                        |
+| No match                 | Honest no-match plus deterministic browse/filter path                                       |
+| Suppression              | Do not display invalid/blocked output; persist reason and fallback state                    |
 
 - Every selected and rejected candidate has a machine-readable reason.
 - Price, availability, discount, and payment claims originate from authoritative API facts—not LLM text.

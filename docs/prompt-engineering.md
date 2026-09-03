@@ -10,14 +10,14 @@ Prompts are versioned configuration, reviewed like code, and never constructed f
 
 ## Agent prompts
 
-| Agent | Task instruction | Required behavior |
-|---|---|---|
-| Intent detection | Extract explicit/inferred intent and ambiguities. | Do not infer sensitive traits; mark absent fields unknown; cite source turn. |
-| Retrieval planner | Convert intent into allowlisted category/attribute/query filters. | Request only typed read-only retrieval; do not select product facts. |
-| Recommendation | Evaluate supplied eligible candidates against intent. | Rank only supplied IDs; reason codes link to evidence IDs. |
-| Offer | Evaluate supplied complementary candidates and active offers. | Mark each proposal optional; use supplied discount/eligibility facts only. |
-| Explanation | Explain selected result using evidence. | Concise explanation; no assertion without evidence ID. |
-| Clarification | Ask the smallest question that resolves key ambiguity. | Do not request unnecessary personal data. |
+| Agent             | Task instruction                                                  | Required behavior                                                            |
+| ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Intent detection  | Extract explicit/inferred intent and ambiguities.                 | Do not infer sensitive traits; mark absent fields unknown; cite source turn. |
+| Retrieval planner | Convert intent into allowlisted category/attribute/query filters. | Request only typed read-only retrieval; do not select product facts.         |
+| Recommendation    | Evaluate supplied eligible candidates against intent.             | Rank only supplied IDs; reason codes link to evidence IDs.                   |
+| Offer             | Evaluate supplied complementary candidates and active offers.     | Mark each proposal optional; use supplied discount/eligibility facts only.   |
+| Explanation       | Explain selected result using evidence.                           | Concise explanation; no assertion without evidence ID.                       |
+| Clarification     | Ask the smallest question that resolves key ambiguity.            | Do not request unnecessary personal data.                                    |
 
 ## Structured output contracts
 
@@ -43,13 +43,15 @@ All responses validate against strict JSON Schema. Invalid JSON, unknown keys, i
 
 ```json
 {
-  "selected": [{
-    "variant_id": "UUID supplied in candidates",
-    "rank": 1,
-    "reason_codes": ["BUDGET_MATCH", "ATTRIBUTE_MATCH", "IN_STOCK"],
-    "evidence_ids": ["catalog:variant:uuid:price", "inventory:variant:uuid:v42"],
-    "explanation": "Within your budget, in stock, and matches your noise-cancellation requirement."
-  }],
+  "selected": [
+    {
+      "variant_id": "UUID supplied in candidates",
+      "rank": 1,
+      "reason_codes": ["BUDGET_MATCH", "ATTRIBUTE_MATCH", "IN_STOCK"],
+      "evidence_ids": ["catalog:variant:uuid:price", "inventory:variant:uuid:v42"],
+      "explanation": "Within your budget, in stock, and matches your noise-cancellation requirement."
+    }
+  ],
   "confidence_score": 0.91,
   "clarification_needed": false,
   "rejected_candidate_ids": [{ "variant_id": "UUID", "reason_code": "OUT_OF_STOCK" }]

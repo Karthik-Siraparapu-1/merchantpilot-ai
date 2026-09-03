@@ -7,9 +7,6 @@
     "declaration": true,
     "declarationMap": true
   },
-  "references": [
-    { "path": "../../packages/config" },
-    { "path": "../../packages/observability" }
-  ],
+  "references": [{ "path": "../../packages/config" }, { "path": "../../packages/observability" }],
   "include": ["src/**/*.ts"]
 }

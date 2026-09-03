@@ -31,15 +31,15 @@ Pull requests run linting, formatting, type checks, unit/contract tests, migrati
 
 ## Environment variables
 
-| Category | Required configuration |
-|---|---|
-| Runtime | environment, service, public URL, CORS origins, log level |
-| Data | database/Redis URLs, connection limits, encryption/KMS reference |
-| Identity | OIDC issuer, audience, client IDs, redirect URIs |
-| Payments | Razorpay Test Mode key ID, secret, webhook secret, API base URL |
-| AI | provider key, model IDs, embedding model, limits, retention setting |
-| Observability | OpenTelemetry endpoint, metrics credentials, error-reporting DSN |
-| Jobs | queue namespace, concurrency, retry/dead-letter policy |
+| Category      | Required configuration                                              |
+| ------------- | ------------------------------------------------------------------- |
+| Runtime       | environment, service, public URL, CORS origins, log level           |
+| Data          | database/Redis URLs, connection limits, encryption/KMS reference    |
+| Identity      | OIDC issuer, audience, client IDs, redirect URIs                    |
+| Payments      | Razorpay Test Mode key ID, secret, webhook secret, API base URL     |
+| AI            | provider key, model IDs, embedding model, limits, retention setting |
+| Observability | OpenTelemetry endpoint, metrics credentials, error-reporting DSN    |
+| Jobs          | queue namespace, concurrency, retry/dead-letter policy              |
 
 Production startup fails closed if secrets are absent, placeholder values appear, or public settings are incompatible. Deployment injects secrets; CI never emits them.
 
