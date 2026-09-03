@@ -1,0 +1,1 @@
+"""MerchantPilot AI service package."""

@@ -73,9 +73,44 @@ This is the target structure, not scaffolded code. Each deployable application m
 
 Milestones, dependencies, and complexity are defined in [docs/roadmap.md](docs/roadmap.md). The first implementation phase begins only after this architecture is approved.
 
-## Setup instructions
+## Local development
 
-No runnable application is included yet. When implementation is approved, the setup process will require supported Node.js and Python runtimes, Docker for local dependencies, a PostgreSQL database, Redis, an LLM provider credential, and Razorpay Test Mode credentials. Environment-variable contracts and the intended deployment workflow are documented in [docs/deployment.md](docs/deployment.md); these instructions intentionally do not install or configure software.
+### Prerequisites
+
+- Node.js 22 or later and Corepack-managed pnpm 10.6.5.
+- Python 3.12 or later for the FastAPI service.
+- Docker Desktop or a compatible Docker Engine for PostgreSQL and Redis.
+
+### Bootstrap
+
+```bash
+corepack pnpm install
+cp .env.example .env
+docker compose up -d postgres redis
+corepack pnpm build
+corepack pnpm dev
+```
+
+The shared TypeScript configuration validates database and Redis URLs at API and worker startup. Copy service-specific templates when overrides are needed: `apps/web/.env.example`, `apps/api/.env.example`, `apps/worker/.env.example`, and `apps/ai-service/.env.example`. Do not add credentials to source control; use Razorpay Test Mode credentials only.
+
+The FastAPI service is isolated as a Python project. Create an environment and install its declared development requirements before serving it:
+
+```bash
+python3 -m venv apps/ai-service/.venv
+apps/ai-service/.venv/bin/pip install -r apps/ai-service/requirements-dev.txt
+apps/ai-service/.venv/bin/uvicorn merchantpilot_ai.main:app --app-dir apps/ai-service/src --port 8000
+```
+
+### Quality commands
+
+```bash
+corepack pnpm format
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm build
+```
+
+The CI workflow runs formatting verification, linting, type checking, and builds on pull requests and `main` updates. Environment-variable contracts and the deployment strategy remain documented in [docs/deployment.md](docs/deployment.md).
 
 ## Contributing
 

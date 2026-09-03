@@ -1,0 +1,27 @@
+{
+  "name": "@merchantpilot/database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "prisma generate",
+    "lint": "prisma validate",
+    "typecheck": "prisma validate",
+    "test": "prisma validate",
+    "generate": "prisma generate",
+    "validate": "prisma validate",
+    "db:seed": "prisma db seed",
+    "db:migrate": "prisma migrate dev"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
+
