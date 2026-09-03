@@ -8,18 +8,18 @@ Records are append-only, tenant-scoped, tamper-evident through immutable event I
 
 ## Decision record
 
-| Field | Purpose |
-|---|---|
-| `decision_id`, `occurred_at`, `request_id`, `trace_id` | Immutable trace and timeline |
-| `tenant_id`, `storefront_id`, `session_id`, `customer_id_hash`, `conversation_id`, `message_id`, `cart_id` | Tenant-safe journey linkage |
-| `decision_type`, `outcome`, `input_fingerprint`, `intent_snapshot` | Decision and privacy-minimised input context |
-| `catalog_snapshot_version`, `retrieval_index_version` | Evidence freshness |
-| `retrieved_products`, `rejected_products`, `selected_products` | Candidate provenance and stage-specific reasons |
-| `ranking_score_components`, `score_version` | Relevance/revenue score explanation |
-| `merchant_policy_version`, `policy_checks`, `override_id` | Policy applied, rejected, and human-control trace |
-| `offer_evaluation` | Eligibility, discount basis, expected basket delta |
-| `confidence_score`, `confidence_version`, `customer_explanation`, `evidence_links` | Required explainability envelope |
-| `model_metadata`, `fallback_state`, `error_code`, `execution_ms` | Provider/template/index version and operations trace |
+| Field                                                                                                      | Purpose                                              |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `decision_id`, `occurred_at`, `request_id`, `trace_id`                                                     | Immutable trace and timeline                         |
+| `tenant_id`, `storefront_id`, `session_id`, `customer_id_hash`, `conversation_id`, `message_id`, `cart_id` | Tenant-safe journey linkage                          |
+| `decision_type`, `outcome`, `input_fingerprint`, `intent_snapshot`                                         | Decision and privacy-minimised input context         |
+| `catalog_snapshot_version`, `retrieval_index_version`                                                      | Evidence freshness                                   |
+| `retrieved_products`, `rejected_products`, `selected_products`                                             | Candidate provenance and stage-specific reasons      |
+| `ranking_score_components`, `score_version`                                                                | Relevance/revenue score explanation                  |
+| `merchant_policy_version`, `policy_checks`, `override_id`                                                  | Policy applied, rejected, and human-control trace    |
+| `offer_evaluation`                                                                                         | Eligibility, discount basis, expected basket delta   |
+| `confidence_score`, `confidence_version`, `customer_explanation`, `evidence_links`                         | Required explainability envelope                     |
+| `model_metadata`, `fallback_state`, `error_code`, `execution_ms`                                           | Provider/template/index version and operations trace |
 
 ## Outcome linkage
 

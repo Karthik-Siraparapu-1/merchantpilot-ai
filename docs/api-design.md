@@ -15,26 +15,26 @@ Merchant APIs use OIDC bearer access tokens. The API verifies issuer, audience, 
 
 ## Endpoints
 
-| Area | Method and path | Authorization | Purpose |
-|---|---|---|---|
-| Identity | `GET /me` | authenticated | Current actor and memberships |
-| Tenants | `GET /tenants/{tenantId}` | `tenant:read` | Tenant configuration |
-| Catalog | `GET /products` | storefront or `catalog:read` | Filtered product listing |
-| Catalog | `POST /products` | `catalog:write` | Create product |
-| Catalog | `PATCH /products/{productId}` | `catalog:write` | Update product with ETag |
-| Inventory | `PATCH /variants/{variantId}/inventory` | `inventory:write` | Adjust inventory with reason |
-| Conversations | `POST /storefront/conversations` | storefront | Start conversation |
-| Conversations | `POST /storefront/conversations/{id}/messages` | storefront | Send message and receive grounded answer |
-| Recommendations | `GET /storefront/recommendations` | storefront | Get basket-aware recommendations |
-| Offers | `POST /storefront/offers/evaluate` | storefront | Evaluate eligible upsells |
-| Cart | `POST /storefront/carts` | storefront | Create cart |
-| Cart | `PATCH /storefront/carts/{id}/items` | storefront | Add, update, or remove item |
-| Checkout | `POST /storefront/orders` | storefront | Create pending order and Razorpay order |
-| Checkout | `GET /storefront/orders/{id}` | storefront | Read permitted order state |
-| Payments | `POST /webhooks/razorpay` | Razorpay signature | Receive provider event |
-| Experiments | `POST /experiments` | `experiment:write` | Create controlled experiment |
-| Analytics | `GET /analytics/revenue-attribution` | `analytics:read` | Explain decision/offer impact |
-| Audit | `GET /audit-events` | `audit:read` | Search auditable activity |
+| Area            | Method and path                                | Authorization                | Purpose                                  |
+| --------------- | ---------------------------------------------- | ---------------------------- | ---------------------------------------- |
+| Identity        | `GET /me`                                      | authenticated                | Current actor and memberships            |
+| Tenants         | `GET /tenants/{tenantId}`                      | `tenant:read`                | Tenant configuration                     |
+| Catalog         | `GET /products`                                | storefront or `catalog:read` | Filtered product listing                 |
+| Catalog         | `POST /products`                               | `catalog:write`              | Create product                           |
+| Catalog         | `PATCH /products/{productId}`                  | `catalog:write`              | Update product with ETag                 |
+| Inventory       | `PATCH /variants/{variantId}/inventory`        | `inventory:write`            | Adjust inventory with reason             |
+| Conversations   | `POST /storefront/conversations`               | storefront                   | Start conversation                       |
+| Conversations   | `POST /storefront/conversations/{id}/messages` | storefront                   | Send message and receive grounded answer |
+| Recommendations | `GET /storefront/recommendations`              | storefront                   | Get basket-aware recommendations         |
+| Offers          | `POST /storefront/offers/evaluate`             | storefront                   | Evaluate eligible upsells                |
+| Cart            | `POST /storefront/carts`                       | storefront                   | Create cart                              |
+| Cart            | `PATCH /storefront/carts/{id}/items`           | storefront                   | Add, update, or remove item              |
+| Checkout        | `POST /storefront/orders`                      | storefront                   | Create pending order and Razorpay order  |
+| Checkout        | `GET /storefront/orders/{id}`                  | storefront                   | Read permitted order state               |
+| Payments        | `POST /webhooks/razorpay`                      | Razorpay signature           | Receive provider event                   |
+| Experiments     | `POST /experiments`                            | `experiment:write`           | Create controlled experiment             |
+| Analytics       | `GET /analytics/revenue-attribution`           | `analytics:read`             | Explain decision/offer impact            |
+| Audit           | `GET /audit-events`                            | `audit:read`                 | Search auditable activity                |
 
 ## Request and response
 
@@ -53,15 +53,17 @@ Merchant APIs use OIDC bearer access tokens. The API verifies issuer, audience, 
   "data": {
     "messageId": "018f3c77-0d4f-7cb0-9876-636e1af0a24e",
     "answer": "These options match your budget and laptop-size preference.",
-    "recommendations": [{
-      "productId": "018f3c72-dc1a-7748-a843-9b2b12b2c417",
-      "variantId": "018f3c73-73f4-7b1e-a4d3-5ef36d304af9",
-      "rank": 1,
-      "explanation": {
-        "reasonCodes": ["BUDGET_MATCH", "USE_CASE_MATCH", "IN_STOCK"],
-        "evidence": ["Price ₹2,799", "15-inch laptop compartment", "Available inventory"]
+    "recommendations": [
+      {
+        "productId": "018f3c72-dc1a-7748-a843-9b2b12b2c417",
+        "variantId": "018f3c73-73f4-7b1e-a4d3-5ef36d304af9",
+        "rank": 1,
+        "explanation": {
+          "reasonCodes": ["BUDGET_MATCH", "USE_CASE_MATCH", "IN_STOCK"],
+          "evidence": ["Price ₹2,799", "15-inch laptop compartment", "Available inventory"]
+        }
       }
-    }]
+    ]
   },
   "meta": { "requestId": "...", "decisionId": "..." }
 }
@@ -80,7 +82,9 @@ All failures use RFC 9457 problem details:
   "status": 422,
   "code": "VALIDATION_FAILED",
   "detail": "One or more fields are invalid.",
-  "errors": [{ "field": "message", "code": "MAX_LENGTH", "message": "Must not exceed 2000 characters." }],
+  "errors": [
+    { "field": "message", "code": "MAX_LENGTH", "message": "Must not exceed 2000 characters." }
+  ],
   "requestId": "..."
 }
 ```

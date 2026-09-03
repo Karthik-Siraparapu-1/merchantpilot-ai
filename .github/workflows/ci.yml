@@ -11,6 +11,12 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://merchantpilot:merchantpilot@localhost:5432/merchantpilot?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-mock-secret-key-12345
+      JWT_REFRESH_SECRET: ci-mock-refresh-secret-12345
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

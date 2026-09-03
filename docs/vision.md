@@ -6,13 +6,13 @@ MerchantPilot AI is the decision layer between a merchant's catalog and a shoppe
 
 ## User personas
 
-| Persona | Primary need | Key outcome |
-|---|---|---|
-| Merchant owner | Confident growth without a data-science team | Revenue visibility, governance, simple controls |
-| Growth manager | Faster experimentation and merchandising | Attributable, targeted offers |
-| Catalog manager | Accurate discovery | Structured catalog in natural language |
-| Shopper | Low-friction selection | Relevant, truthful answers and simple checkout |
-| Support operator | Explain decisions and payment state | Searchable conversation, decision, and order history |
+| Persona          | Primary need                                 | Key outcome                                          |
+| ---------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Merchant owner   | Confident growth without a data-science team | Revenue visibility, governance, simple controls      |
+| Growth manager   | Faster experimentation and merchandising     | Attributable, targeted offers                        |
+| Catalog manager  | Accurate discovery                           | Structured catalog in natural language               |
+| Shopper          | Low-friction selection                       | Relevant, truthful answers and simple checkout       |
+| Support operator | Explain decisions and payment state          | Searchable conversation, decision, and order history |
 
 ## Merchant problems
 
@@ -24,15 +24,15 @@ MerchantPilot AI is the decision layer between a merchant's catalog and a shoppe
 
 ## Success metrics
 
-| Area | Metric | Success criterion |
-|---|---|---|
-| Commerce | Conversion rate | Credible improvement against control |
-| Basket growth | Average order value | Positive incremental AOV after offer cost |
-| Recommendation quality | Click-through and add-to-cart rate | Improvement over baseline merchandising |
-| Trust | Explanation coverage | 100% of displayed recommendations stored with evidence |
-| AI safety | Unsupported-answer rate | Below agreed operational threshold; incidents reviewable |
-| Reliability | Checkout API success | 99.9% excluding provider incidents |
-| Latency | Recommendation p95 | Under 800 ms for cached/ranked results |
+| Area                   | Metric                             | Success criterion                                        |
+| ---------------------- | ---------------------------------- | -------------------------------------------------------- |
+| Commerce               | Conversion rate                    | Credible improvement against control                     |
+| Basket growth          | Average order value                | Positive incremental AOV after offer cost                |
+| Recommendation quality | Click-through and add-to-cart rate | Improvement over baseline merchandising                  |
+| Trust                  | Explanation coverage               | 100% of displayed recommendations stored with evidence   |
+| AI safety              | Unsupported-answer rate            | Below agreed operational threshold; incidents reviewable |
+| Reliability            | Checkout API success               | 99.9% excluding provider incidents                       |
+| Latency                | Recommendation p95                 | Under 800 ms for cached/ranked results                   |
 
 Experiment conclusions require sufficient sample size, stable instrumentation, and segmentation review.
 

@@ -5,5 +5,5 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["generated/client/**/*.ts"]
+  "include": ["prisma/**/*.ts", "generated/client/**/*.ts"]
 }

@@ -1,4 +1,20 @@
-import { PrismaClient, UserRole, StoreStatus, ProductStatus, MessageActor, RecommendationType, RecommendationStatus, CartStatus, OrderStatus, PaymentStatus, PaymentMethod, AIExecutionStatus, AuditAction, ActorType, AnalyticsEventType } from '../generated/client';
+import {
+  PrismaClient,
+  UserRole,
+  StoreStatus,
+  ProductStatus,
+  MessageActor,
+  RecommendationType,
+  RecommendationStatus,
+  CartStatus,
+  OrderStatus,
+  PaymentStatus,
+  PaymentMethod,
+  AIExecutionStatus,
+  AuditAction,
+  ActorType,
+  AnalyticsEventType
+} from '../generated/client';
 
 const prisma = new PrismaClient();
 
@@ -12,8 +28,8 @@ async function main() {
     create: {
       name: 'Bharat Crafts & Apparel',
       slug: 'bharat-crafts',
-      status: 'ACTIVE',
-    },
+      status: 'ACTIVE'
+    }
   });
 
   const ownerUser = await prisma.user.upsert({
@@ -23,8 +39,8 @@ async function main() {
       email: 'owner@bharatcrafts.com',
       firstName: 'Rajesh',
       lastName: 'Sharma',
-      status: 'ACTIVE',
-    },
+      status: 'ACTIVE'
+    }
   });
 
   const shopperUser = await prisma.user.upsert({
@@ -34,23 +50,23 @@ async function main() {
       email: 'shopper.priya@gmail.com',
       firstName: 'Priya',
       lastName: 'Patel',
-      status: 'ACTIVE',
-    },
+      status: 'ACTIVE'
+    }
   });
 
   await prisma.role.upsert({
     where: {
       merchantId_userId: {
         merchantId: merchant.id,
-        userId: ownerUser.id,
-      },
+        userId: ownerUser.id
+      }
     },
     update: {},
     create: {
       merchantId: merchant.id,
       userId: ownerUser.id,
-      role: UserRole.MERCHANT_OWNER,
-    },
+      role: UserRole.MERCHANT_OWNER
+    }
   });
 
   // 2. Store & Catalog & Categories
@@ -61,8 +77,8 @@ async function main() {
       merchantId: merchant.id,
       name: 'Bharat Crafts Flagship Store',
       slug: 'bharat-crafts-main',
-      status: StoreStatus.ACTIVE,
-    },
+      status: StoreStatus.ACTIVE
+    }
   });
 
   const catalog = await prisma.catalog.upsert({
@@ -71,39 +87,39 @@ async function main() {
     create: {
       storeId: store.id,
       name: 'Main Product Catalog',
-      description: 'Handcrafted sarees, ethnic wear, and artisanal home decor',
-    },
+      description: 'Handcrafted sarees, ethnic wear, and artisanal home decor'
+    }
   });
 
   const categoryApparel = await prisma.category.upsert({
     where: {
       catalogId_slug: {
         catalogId: catalog.id,
-        slug: 'ethnic-apparel',
-      },
+        slug: 'ethnic-apparel'
+      }
     },
     update: {},
     create: {
       catalogId: catalog.id,
       name: 'Ethnic Apparel',
-      slug: 'ethnic-apparel',
-    },
+      slug: 'ethnic-apparel'
+    }
   });
 
   const categorySarees = await prisma.category.upsert({
     where: {
       catalogId_slug: {
         catalogId: catalog.id,
-        slug: 'silk-sarees',
-      },
+        slug: 'silk-sarees'
+      }
     },
     update: {},
     create: {
       catalogId: catalog.id,
       parentId: categoryApparel.id,
       name: 'Silk Sarees',
-      slug: 'silk-sarees',
-    },
+      slug: 'silk-sarees'
+    }
   });
 
   // 3. Products & Inventories
@@ -111,8 +127,8 @@ async function main() {
     where: {
       storeId_sku: {
         storeId: store.id,
-        sku: 'SAREE-KANCHI-001',
-      },
+        sku: 'SAREE-KANCHI-001'
+      }
     },
     update: {},
     create: {
@@ -124,8 +140,8 @@ async function main() {
       description: 'Authentic handwoven Kanjeevaram pure silk saree with zari border',
       priceMinor: 1499900, // ₹14,999.00
       currency: 'INR',
-      status: ProductStatus.ACTIVE,
-    },
+      status: ProductStatus.ACTIVE
+    }
   });
 
   await prisma.inventory.upsert({
@@ -136,16 +152,16 @@ async function main() {
       storeId: store.id,
       availableQuantity: 25,
       reservedQuantity: 2,
-      reorderThreshold: 5,
-    },
+      reorderThreshold: 5
+    }
   });
 
   const clutchProduct = await prisma.product.upsert({
     where: {
       storeId_sku: {
         storeId: store.id,
-        sku: 'ACC-CLUTCH-002',
-      },
+        sku: 'ACC-CLUTCH-002'
+      }
     },
     update: {},
     create: {
@@ -157,8 +173,8 @@ async function main() {
       description: 'Elegant golden zardosi clutch matching traditional festive wear',
       priceMinor: 249900, // ₹2,499.00
       currency: 'INR',
-      status: ProductStatus.ACTIVE,
-    },
+      status: ProductStatus.ACTIVE
+    }
   });
 
   await prisma.inventory.upsert({
@@ -169,8 +185,8 @@ async function main() {
       storeId: store.id,
       availableQuantity: 40,
       reservedQuantity: 1,
-      reorderThreshold: 10,
-    },
+      reorderThreshold: 10
+    }
   });
 
   // 4. Policy & Experiment
@@ -183,8 +199,8 @@ async function main() {
       maxDiscountPercent: 12.5,
       minCartValueForUpsell: 500000, // ₹5,000.00
       minConfidenceThreshold: 0.75,
-      requireExplanation: true,
-    },
+      requireExplanation: true
+    }
   });
 
   const experiment = await prisma.experiment.create({
@@ -198,17 +214,17 @@ async function main() {
           {
             name: 'Variant A - Contextual Zari Match',
             promptTemplate: 'Recommend clutch matching saree color and zari type',
-            trafficAllocation: 0.5,
+            trafficAllocation: 0.5
           },
           {
             name: 'Variant B - High Revenue Lift Focus',
             promptTemplate: 'Recommend top revenue margin accessory',
-            trafficAllocation: 0.5,
-          },
-        ],
-      },
+            trafficAllocation: 0.5
+          }
+        ]
+      }
     },
-    include: { variants: true },
+    include: { variants: true }
   });
 
   const activeVariant = experiment.variants[0];
@@ -218,8 +234,8 @@ async function main() {
     data: {
       merchantId: merchant.id,
       storeId: store.id,
-      customerId: shopperUser.id,
-    },
+      customerId: shopperUser.id
+    }
   });
 
   const shopperMessage = await prisma.message.create({
@@ -227,8 +243,8 @@ async function main() {
       conversationId: conversation.id,
       merchantId: merchant.id,
       actor: MessageActor.SHOPPER,
-      content: 'I am looking for a silk saree for a wedding reception. Any matching accessories?',
-    },
+      content: 'I am looking for a silk saree for a wedding reception. Any matching accessories?'
+    }
   });
 
   const aiExecution = await prisma.aIExecution.create({
@@ -243,12 +259,13 @@ async function main() {
       confidence: 0.94,
       revenueScore: 0.88,
       merchantPolicyVersion: policy.policyVersion,
-      explanation: 'Zardosi Golden Clutch perfectly complements the crimson-gold Kanjeevaram saree border.',
+      explanation:
+        'Zardosi Golden Clutch perfectly complements the crimson-gold Kanjeevaram saree border.',
       model: 'gemini-1.5-pro',
       latency: 420,
       tokensUsed: 650,
-      status: AIExecutionStatus.SUCCESS,
-    },
+      status: AIExecutionStatus.SUCCESS
+    }
   });
 
   const recommendation = await prisma.recommendation.create({
@@ -260,7 +277,8 @@ async function main() {
       variantId: activeVariant.id,
       aiExecutionId: aiExecution.id,
       confidence: 0.94,
-      explanation: 'Pair your Kanjeevaram Saree with this Zardosi Silk Clutch for a complete wedding look!',
+      explanation:
+        'Pair your Kanjeevaram Saree with this Zardosi Silk Clutch for a complete wedding look!',
       revenueLiftPrediction: 16.6,
       recommendationType: RecommendationType.UPSELL,
       status: RecommendationStatus.ACCEPTED,
@@ -269,16 +287,16 @@ async function main() {
           {
             code: 'COLOR_HARMONY',
             reason: 'Matching Gold Zari Craftsmanship',
-            score: 0.95,
+            score: 0.95
           },
           {
             code: 'HIGH_CONVERSION_PAIR',
             reason: '84% of shoppers who bought Kanjeevaram sarees added this clutch',
-            score: 0.89,
-          },
-        ],
-      },
-    },
+            score: 0.89
+          }
+        ]
+      }
+    }
   });
 
   // 6. Cart, Order & Payment
@@ -294,16 +312,16 @@ async function main() {
           {
             productId: sareeProduct.id,
             quantity: 1,
-            priceMinor: 1499900,
+            priceMinor: 1499900
           },
           {
             productId: clutchProduct.id,
             quantity: 1,
-            priceMinor: 249900,
-          },
-        ],
-      },
-    },
+            priceMinor: 249900
+          }
+        ]
+      }
+    }
   });
 
   const orderNumber = `ORD-20260903-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -326,18 +344,18 @@ async function main() {
             title: sareeProduct.title,
             sku: sareeProduct.sku,
             quantity: 1,
-            priceMinor: 1499900,
+            priceMinor: 1499900
           },
           {
             productId: clutchProduct.id,
             title: clutchProduct.title,
             sku: clutchProduct.sku,
             quantity: 1,
-            priceMinor: 249900,
-          },
-        ],
-      },
-    },
+            priceMinor: 249900
+          }
+        ]
+      }
+    }
   });
 
   const payment = await prisma.payment.create({
@@ -350,8 +368,8 @@ async function main() {
       amountMinor: 1749800,
       currency: 'INR',
       status: PaymentStatus.CAPTURED,
-      method: PaymentMethod.RAZORPAY_TEST,
-    },
+      method: PaymentMethod.RAZORPAY_TEST
+    }
   });
 
   // 7. AuditLog, Webhook & Analytics
@@ -368,8 +386,8 @@ async function main() {
       entityName: 'Recommendation',
       entityId: recommendation.id,
       beforeState: {},
-      afterState: { recommendationId: recommendation.id, confidence: 0.94 },
-    },
+      afterState: { recommendationId: recommendation.id, confidence: 0.94 }
+    }
   });
 
   await prisma.webhookEvent.create({
@@ -382,11 +400,11 @@ async function main() {
         entity: 'event',
         event: 'payment.captured',
         contains: ['payment'],
-        payload: { payment: { entity: { id: payment.razorpayPaymentId, amount: 1749800 } } },
+        payload: { payment: { entity: { id: payment.razorpayPaymentId, amount: 1749800 } } }
       },
       status: 'PROCESSED',
-      processedAt: new Date(),
-    },
+      processedAt: new Date()
+    }
   });
 
   await prisma.analyticsEvent.create({
@@ -402,8 +420,8 @@ async function main() {
       eventType: AnalyticsEventType.REVENUE_ATTRIBUTED,
       revenueAmount: 249900, // ₹2,499.00 attributed lift
       currency: 'INR',
-      metadata: { source: 'conversational_upsell_clutch' },
-    },
+      metadata: { source: 'conversational_upsell_clutch' }
+    }
   });
 
   console.log('✅ Database seed completed successfully!');

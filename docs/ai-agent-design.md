@@ -28,19 +28,19 @@ The orchestrator makes each stage observable and versioned. A failure or policy 
 
 Every displayable AI decision shall be persisted before return with this logical schema:
 
-| Field | Requirement |
-|---|---|
-| `decision_id` | Immutable UUID, correlated to request/conversation/cart where relevant |
-| `tenant_id` / `storefront_id` | Required tenancy and channel binding |
-| `decision_type` | `conversation_answer`, `recommendation`, `upsell`, or `suppression` |
-| `intent` | Structured intent, extracted constraints, and ambiguity flags |
-| `candidate_ids` / `selected_ids` | Retrieved and selected catalog variants, in rank order |
-| `confidence_score` | Calibrated decimal 0–1 with score version |
-| `explanation` | Customer-facing concise reason plus machine reason codes |
-| `retrieved_evidence` | Source IDs, content/version hashes, and exact structured facts used |
-| `policy_evaluation` | Policy version, checks, rejections, overrides, eligibility result |
-| `model_metadata` | Model, prompt/template version, retrieval/index version, latency, fallback flag |
-| `audit_record` | Actor/session, timestamp, request ID, outcome, redacted input fingerprint |
+| Field                            | Requirement                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `decision_id`                    | Immutable UUID, correlated to request/conversation/cart where relevant          |
+| `tenant_id` / `storefront_id`    | Required tenancy and channel binding                                            |
+| `decision_type`                  | `conversation_answer`, `recommendation`, `upsell`, or `suppression`             |
+| `intent`                         | Structured intent, extracted constraints, and ambiguity flags                   |
+| `candidate_ids` / `selected_ids` | Retrieved and selected catalog variants, in rank order                          |
+| `confidence_score`               | Calibrated decimal 0–1 with score version                                       |
+| `explanation`                    | Customer-facing concise reason plus machine reason codes                        |
+| `retrieved_evidence`             | Source IDs, content/version hashes, and exact structured facts used             |
+| `policy_evaluation`              | Policy version, checks, rejections, overrides, eligibility result               |
+| `model_metadata`                 | Model, prompt/template version, retrieval/index version, latency, fallback flag |
+| `audit_record`                   | Actor/session, timestamp, request ID, outcome, redacted input fingerprint       |
 
 If `confidence_score`, `explanation`, `retrieved_evidence`, or `audit_record` is absent, the response is suppressed. The system stores evidence and outputs, not hidden reasoning traces.
 
