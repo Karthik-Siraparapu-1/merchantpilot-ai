@@ -19,19 +19,25 @@ This document provides complete documentation for the PostgreSQL database schema
 ### 1. Identity & RBAC Domain
 
 #### `Merchant`
+
 Top-level multi-tenant account boundary.
+
 - **`id`**: `UUID` (PK)
 - **`slug`**: `String` (UNIQUE) - URL-safe merchant handle.
 - **Indexes**: `(createdAt)`, `(status)`
 
 #### `User`
+
 Human user identities (merchant owners, support staff, merchandisers, and shoppers).
+
 - **`id`**: `UUID` (PK)
 - **`email`**: `String` (UNIQUE) - Case-normalized unique user email.
 - **Indexes**: `(email)`, `(status)`, `(createdAt)`
 
 #### `Role`
+
 Multi-tenant Role-Based Access Control (RBAC) mapping.
+
 - **`merchantId`**, **`userId`**: Foreign keys mapping user to merchant with assigned `UserRole` enum (`MERCHANT_OWNER`, `MERCHANDISER`, `SUPPORT_AGENT`, `PLATFORM_OPERATOR`, `SHOPPER`).
 - **Constraints**: `UNIQUE(merchantId, userId)`
 
@@ -40,21 +46,29 @@ Multi-tenant Role-Based Access Control (RBAC) mapping.
 ### 2. Store & Catalog Domain
 
 #### `Store`
+
 Storefront configuration instance owned by a merchant.
+
 - **`publicKey`**: `UUID` (UNIQUE) - Client-facing API key for storefront SDKs.
 - **`status`**: `StoreStatus` enum (`ACTIVE`, `INACTIVE`, `MAINTENANCE`).
 
 #### `Catalog` & `Category`
+
 Product organization hierarchy. `Category` contains a self-referencing `parentId` for nested subcategories.
+
 - **Constraints**: `UNIQUE(catalogId, slug)`
 
 #### `Product`
+
 Sellable catalog items.
+
 - **`priceMinor`**: Integer price in minor units (e.g., 1499900 = ₹14,999.00).
 - **Constraints**: `UNIQUE(storeId, sku)` - Guarantees unique SKU per store.
 
 #### `Inventory`
+
 Real-time stock balance tracking with concurrent reservation capability.
+
 - **`availableQuantity`**: Stock available for purchase.
 - **`reservedQuantity`**: Stock locked in active checkouts.
 - **`reorderThreshold`**: Inventory trigger level for merchant restock alerts.
@@ -64,14 +78,18 @@ Real-time stock balance tracking with concurrent reservation capability.
 ### 3. Merchandising & Commercial Policies
 
 #### `MerchantPolicy`
+
 Structured rules defining AI decision boundaries.
+
 - **`maxDiscountPercent`**: Cap on automated discounts (e.g., `15.0`%).
 - **`minCartValueForUpsell`**: Basket threshold (minor units) required before triggering upsell suggestions.
 - **`blacklistedCategoryIds`**: JSON array of category UUIDs excluded from AI processing.
 - **`minConfidenceThreshold`**: Minimum AI model score required before displaying recommendations.
 
 #### `Offer`
+
 Promotional offers governed by merchant policies.
+
 - **`offerType`**: `PERCENTAGE_DISCOUNT`, `FIXED_AMOUNT_DISCOUNT`, `BUY_X_GET_Y`, `FREE_SHIPPING`.
 
 ---
@@ -79,7 +97,9 @@ Promotional offers governed by merchant policies.
 ### 4. A/B Testing & Experimentation
 
 #### `Experiment` & `ExperimentVariant`
+
 First-class A/B testing infrastructure enabling quantitative comparison of recommendation models and prompt policies.
+
 - **`trafficAllocation`**: Percentage split for variant assignment (e.g., `0.5` for 50/50 split).
 - **`modelConfig`**: JSON payload configuring prompt parameters or AI ranker weights.
 
@@ -88,11 +108,15 @@ First-class A/B testing infrastructure enabling quantitative comparison of recom
 ### 5. Conversational AI & Explainability Engine
 
 #### `Conversation` & `Message`
+
 Dialogue stream between shoppers, AI assistant, and human support agents.
+
 - **`actor`**: `SHOPPER`, `AI_ASSISTANT`, `SUPPORT_AGENT`, `SYSTEM`.
 
 #### `AIExecution`
+
 Detailed trace for every AI retrieval, candidate evaluation, and reranking step.
+
 - **`intent`**: Recognized shopper intent.
 - **`retrievedProducts`**: Vector/keyword retrieval candidate product IDs.
 - **`candidateProducts`**: Candidates passed to reranker.
@@ -101,7 +125,9 @@ Detailed trace for every AI retrieval, candidate evaluation, and reranking step.
 - **`tokensUsed`**: Total LLM tokens consumed.
 
 #### `Recommendation` & `RecommendationReason`
+
 AI-generated product suggestions presented to the shopper.
+
 - **`confidence`**: Floating-point score `[0.0 - 1.0]`.
 - **`revenueLiftPrediction`**: Predicted conversion/revenue lift percentage.
 - **`reasons`**: Structured explanation codes (e.g., `COLOR_HARMONY`, `BASKET_COMPLEMENT`).
@@ -111,16 +137,22 @@ AI-generated product suggestions presented to the shopper.
 ### 6. Cart, Orders & Payment Lifecycle
 
 #### `Cart` & `CartItem`
+
 Shopper basket container.
+
 - **Constraints**: `UNIQUE(cartId, productId)`
 
 #### `Order` & `OrderItem`
+
 Immutable commercial purchase commitment.
+
 - **`orderNumber`**: Human-readable unique invoice number.
 - **`razorpayOrderId`**: UNIQUE Razorpay Test Mode Order ID.
 
 #### `Payment`
+
 Payment attempt reconciliation ledger.
+
 - **`razorpayPaymentId`**: UNIQUE Razorpay Payment ID.
 - **`status`**: `INITIATED`, `AUTHORIZED`, `CAPTURED`, `FAILED`, `REFUNDED`.
 
@@ -129,16 +161,22 @@ Payment attempt reconciliation ledger.
 ### 7. Audit, Webhooks & Analytics Stream
 
 #### `AuditLog`
+
 Security and compliance log capturing all administrative and AI mutations.
+
 - **`correlationId`**: HTTP request trace ID linking web requests to async job execution.
 - **`beforeState`** & **`afterState`**: JSON state snapshots before and after mutation.
 
 #### `WebhookEvent`
+
 Idempotent webhook processing log for Razorpay payment notifications.
+
 - **`eventId`**: UNIQUE webhook notification ID.
 
 #### `AnalyticsEvent`
+
 Funnel metrics event stream for revenue attribution and conversion tracking.
+
 - **`eventType`**: `RECOMMENDATION_IMPRESSION`, `RECOMMENDATION_CLICK`, `UPSELL_ACCEPTED`, `CHECKOUT_STARTED`, `PAYMENT_SUCCESS`, `PAYMENT_FAILED`, `REVENUE_ATTRIBUTED`.
 - **`revenueAmount`**: Attributed financial value in minor units.
 
@@ -147,6 +185,7 @@ Funnel metrics event stream for revenue attribution and conversion tracking.
 ## Indexing Strategy
 
 Comprehensive B-tree indexes are implemented across all high-frequency query patterns:
+
 1. **Foreign Keys:** Indexes on all `merchantId`, `storeId`, `conversationId`, `orderId`, `paymentId`, `experimentId`, and `productId` fields.
 2. **Status Filtering:** Indexes on `status`, `offerStatus`, `eventType`, and `actorType`.
 3. **Time-Series Queries:** Indexes on `createdAt` across all ledgers for rapid time-range aggregation and reporting.

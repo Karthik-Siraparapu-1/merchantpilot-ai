@@ -28,26 +28,26 @@ Search, static bundles, rule engines, and generic chatbots solve narrow aspects 
 
 MerchantPilot AI provides a merchant-controlled agent that converts customer intent into qualified commerce decisions, explains why each decision was made, and measures the resulting revenue impact.
 
-| Outcome | KPI | Measurement |
-|---|---|---|
-| Better purchase completion | Conversion rate | Paid orders / eligible shopper sessions, segmented by experiment |
-| Larger baskets | Average order value | Paid order revenue / paid orders, net of refunds and offer cost |
-| Recommendation relevance | Recommendation CTR and add-to-cart rate | Attributable events divided by eligible impressions |
-| Commercial integrity | Discount cost and gross-margin guardrail adherence | Order/offer ledger against merchant policy |
-| Explainability | Explanation coverage | Decisions with reason codes, evidence, model/policy versions / displayed decisions |
-| Reliability | Checkout completion and webhook-processing success rate | Provider-correlated order attempts and events |
+| Outcome                    | KPI                                                     | Measurement                                                                        |
+| -------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Better purchase completion | Conversion rate                                         | Paid orders / eligible shopper sessions, segmented by experiment                   |
+| Larger baskets             | Average order value                                     | Paid order revenue / paid orders, net of refunds and offer cost                    |
+| Recommendation relevance   | Recommendation CTR and add-to-cart rate                 | Attributable events divided by eligible impressions                                |
+| Commercial integrity       | Discount cost and gross-margin guardrail adherence      | Order/offer ledger against merchant policy                                         |
+| Explainability             | Explanation coverage                                    | Decisions with reason codes, evidence, model/policy versions / displayed decisions |
+| Reliability                | Checkout completion and webhook-processing success rate | Provider-correlated order attempts and events                                      |
 
 Success claims require a pre-registered baseline/control, consistent event instrumentation, sufficient sample, and segmentation for storefront, channel, and customer state.
 
 ## 4. Personas
 
-| Persona | Goals | Authorized capabilities |
-|---|---|---|
-| Merchant owner | Grow revenue while retaining control | Tenant settings, policy approval, roles, analytics, overrides |
-| Growth manager | Run offers and experiments | Configure eligible offers, experiments, recommendation policy within granted limits |
-| Customer | Find a suitable product and pay | Conversation, cart, checkout, order-status access for own session |
-| Platform admin | Operate platform safely | Tenant support and platform health; no default access to sensitive tenant data |
-| Support agent | Resolve customer/merchant issues | Read redacted decisions, conversations, orders, and payment state; no secret/payment-control access |
+| Persona        | Goals                                | Authorized capabilities                                                                             |
+| -------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Merchant owner | Grow revenue while retaining control | Tenant settings, policy approval, roles, analytics, overrides                                       |
+| Growth manager | Run offers and experiments           | Configure eligible offers, experiments, recommendation policy within granted limits                 |
+| Customer       | Find a suitable product and pay      | Conversation, cart, checkout, order-status access for own session                                   |
+| Platform admin | Operate platform safely              | Tenant support and platform health; no default access to sensitive tenant data                      |
+| Support agent  | Resolve customer/merchant issues     | Read redacted decisions, conversations, orders, and payment state; no secret/payment-control access |
 
 ## 5. End-to-end journey
 

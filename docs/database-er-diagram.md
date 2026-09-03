@@ -76,30 +76,30 @@ erDiagram
 
 ## Entity Summary Table
 
-| Entity | Primary Key | Key Relationships & Purpose |
-|---|---|---|
-| `Merchant` | `id` (UUID) | Tenant root boundary for stores, policies, and commerce ledgers. |
-| `User` | `id` (UUID) | System user identity with unique email for merchant staff and shoppers. |
-| `Role` | `id` (UUID) | Multi-tenant RBAC mapping linking users and merchants. |
-| `Store` | `id` (UUID) | Merchant storefront configuration and public API key boundary. |
-| `Catalog` | `id` (UUID) | Container for store categories and products. |
-| `Category` | `id` (UUID) | Self-referencing category tree structure (`parentId`). |
-| `Product` | `id` (UUID) | Sellable catalog item with unique SKU per store (`@@unique([storeId, sku])`). |
-| `Inventory` | `id` (UUID) | Real-time stock balance (`availableQuantity`, `reservedQuantity`, `reorderThreshold`). |
-| `MerchantPolicy` | `id` (UUID) | Queryable rules governing discount caps, thresholds, and AI boundaries. |
-| `Offer` | `id` (UUID) | Commercial upsell promotions governed by merchant policies. |
-| `Experiment` | `id` (UUID) | A/B test container for testing prompt policies and recommendation algorithms. |
-| `ExperimentVariant` | `id` (UUID) | Prompt/model configuration variants with traffic allocation. |
-| `Conversation` | `id` (UUID) | Shopper discovery dialogue session. |
-| `Message` | `id` (UUID) | Immutable history of shopper and AI assistant chat messages. |
-| `Recommendation` | `id` (UUID) | AI recommendation item with predicted revenue lift & confidence. |
-| `RecommendationReason`| `id` (UUID) | Granular reasons and match scores explaining recommendation items. |
-| `Cart` | `id` (UUID) | Shopper basket session aggregate. |
-| `CartItem` | `id` (UUID) | Line items inside shopper carts (`@@unique([cartId, productId])`). |
-| `Order` | `id` (UUID) | Commercial commitment with unique order number and Razorpay order ID. |
-| `OrderItem` | `id` (UUID) | Immutable snapshot of purchased products and prices. |
-| `Payment` | `id` (UUID) | Payment attempt lifecycle with unique Razorpay payment ID. |
-| `AIExecution` | `id` (UUID) | Execution log detailing intent, retrieved products, candidate scores, and latency. |
-| `AuditLog` | `id` (UUID) | Compliance ledger capturing correlation IDs, before/after JSON diffs, and actors. |
-| `WebhookEvent` | `id` (UUID) | Inbound Razorpay/gateway event ledger with unique event IDs. |
-| `AnalyticsEvent` | `id` (UUID) | Funnel metrics event stream for revenue attribution and conversion tracking. |
+| Entity                 | Primary Key | Key Relationships & Purpose                                                            |
+| ---------------------- | ----------- | -------------------------------------------------------------------------------------- |
+| `Merchant`             | `id` (UUID) | Tenant root boundary for stores, policies, and commerce ledgers.                       |
+| `User`                 | `id` (UUID) | System user identity with unique email for merchant staff and shoppers.                |
+| `Role`                 | `id` (UUID) | Multi-tenant RBAC mapping linking users and merchants.                                 |
+| `Store`                | `id` (UUID) | Merchant storefront configuration and public API key boundary.                         |
+| `Catalog`              | `id` (UUID) | Container for store categories and products.                                           |
+| `Category`             | `id` (UUID) | Self-referencing category tree structure (`parentId`).                                 |
+| `Product`              | `id` (UUID) | Sellable catalog item with unique SKU per store (`@@unique([storeId, sku])`).          |
+| `Inventory`            | `id` (UUID) | Real-time stock balance (`availableQuantity`, `reservedQuantity`, `reorderThreshold`). |
+| `MerchantPolicy`       | `id` (UUID) | Queryable rules governing discount caps, thresholds, and AI boundaries.                |
+| `Offer`                | `id` (UUID) | Commercial upsell promotions governed by merchant policies.                            |
+| `Experiment`           | `id` (UUID) | A/B test container for testing prompt policies and recommendation algorithms.          |
+| `ExperimentVariant`    | `id` (UUID) | Prompt/model configuration variants with traffic allocation.                           |
+| `Conversation`         | `id` (UUID) | Shopper discovery dialogue session.                                                    |
+| `Message`              | `id` (UUID) | Immutable history of shopper and AI assistant chat messages.                           |
+| `Recommendation`       | `id` (UUID) | AI recommendation item with predicted revenue lift & confidence.                       |
+| `RecommendationReason` | `id` (UUID) | Granular reasons and match scores explaining recommendation items.                     |
+| `Cart`                 | `id` (UUID) | Shopper basket session aggregate.                                                      |
+| `CartItem`             | `id` (UUID) | Line items inside shopper carts (`@@unique([cartId, productId])`).                     |
+| `Order`                | `id` (UUID) | Commercial commitment with unique order number and Razorpay order ID.                  |
+| `OrderItem`            | `id` (UUID) | Immutable snapshot of purchased products and prices.                                   |
+| `Payment`              | `id` (UUID) | Payment attempt lifecycle with unique Razorpay payment ID.                             |
+| `AIExecution`          | `id` (UUID) | Execution log detailing intent, retrieved products, candidate scores, and latency.     |
+| `AuditLog`             | `id` (UUID) | Compliance ledger capturing correlation IDs, before/after JSON diffs, and actors.      |
+| `WebhookEvent`         | `id` (UUID) | Inbound Razorpay/gateway event ledger with unique event IDs.                           |
+| `AnalyticsEvent`       | `id` (UUID) | Funnel metrics event stream for revenue attribution and conversion tracking.           |

@@ -14,14 +14,14 @@ Use deny-by-default RBAC with tenant-scoped permissions: owner, admin, growth_ma
 
 Secrets live in a managed secret store, never in source control, browser bundles, logs, fixtures, or database plaintext. Use independent credentials per environment; rotate and invalidate exposed values immediately. Startup validates required configuration, provenance, and environment compatibility. Only public storefront identifiers may reach browsers.
 
-| Category | Example | Handling |
-|---|---|---|
-| Database | `DATABASE_URL` | Secret; TLS outside local development |
-| Authentication | OIDC issuer/audience/client secret | Client secret server-only |
-| Razorpay | key ID, key secret, webhook secret | Test Mode initially; secret server-only |
-| AI provider | API key/model identifier | Restricted scope; redact logs |
-| Encryption | data-encryption-key reference | Use KMS reference, not raw key |
-| Runtime | environment, origins, log level | Non-secret but strictly validated |
+| Category       | Example                            | Handling                                |
+| -------------- | ---------------------------------- | --------------------------------------- |
+| Database       | `DATABASE_URL`                     | Secret; TLS outside local development   |
+| Authentication | OIDC issuer/audience/client secret | Client secret server-only               |
+| Razorpay       | key ID, key secret, webhook secret | Test Mode initially; secret server-only |
+| AI provider    | API key/model identifier           | Restricted scope; redact logs           |
+| Encryption     | data-encryption-key reference      | Use KMS reference, not raw key          |
+| Runtime        | environment, origins, log level    | Non-secret but strictly validated       |
 
 ## Payment security
 

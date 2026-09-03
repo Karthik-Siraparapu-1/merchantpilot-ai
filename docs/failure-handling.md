@@ -6,20 +6,20 @@ Customer trust, payment correctness, and tenant isolation take priority over con
 
 ## Failure matrix
 
-| Scenario | Customer/API behavior | System action | Signal |
-|---|---|---|---|
-| LLM timeout/unavailable | Deterministic search/filter results if retrieval works; otherwise temporary-unavailable response | Circuit-break provider; one bounded safe retry; persist fallback | Alert on threshold breach; fallback-rate metric |
-| Retrieval/index unavailable | Do not invent results; offer category browse/search | Use last healthy tenant-scoped lexical index if available | Critical alert if no safe path |
-| Empty catalog | State no products are available | Skip AI call and recommendation creation | Merchant catalog alert |
-| Low confidence | Ask focused clarification or show safe browse results | Persist threshold/suppression reason | Confidence metric |
-| Inventory mismatch | Remove unavailable item; reprice/revalidate checkout | Transactional stock recheck; release failed reservation | Audit and mismatch metric |
-| Duplicate checkout | Return original response | Enforce idempotency replay; no second provider call | Duplicate metric |
-| Razorpay API timeout/failure | Processing/unavailable status; never payment success | Persist retry-safe pending state; reconcile via webhook | Payment alert |
-| Payment failure | Show non-paid retry route where allowed | Mark attempt failed; no paid attribution | Failure metric/audit |
-| Webhook duplicate | Successful already-processed acknowledgement | Deduplicate provider event ID | Duplicate metric |
-| Invalid webhook signature | Reject; no state change | Record minimal rejected metadata | Security alert policy |
-| Database timeout | Retryable error with request ID | Roll back; no partial cart/order/payment state | Database alert |
-| Rate limiting | 429 with retry hint | Apply scoped quota | Abuse/quota metric |
+| Scenario                     | Customer/API behavior                                                                            | System action                                                    | Signal                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------------------------------------- |
+| LLM timeout/unavailable      | Deterministic search/filter results if retrieval works; otherwise temporary-unavailable response | Circuit-break provider; one bounded safe retry; persist fallback | Alert on threshold breach; fallback-rate metric |
+| Retrieval/index unavailable  | Do not invent results; offer category browse/search                                              | Use last healthy tenant-scoped lexical index if available        | Critical alert if no safe path                  |
+| Empty catalog                | State no products are available                                                                  | Skip AI call and recommendation creation                         | Merchant catalog alert                          |
+| Low confidence               | Ask focused clarification or show safe browse results                                            | Persist threshold/suppression reason                             | Confidence metric                               |
+| Inventory mismatch           | Remove unavailable item; reprice/revalidate checkout                                             | Transactional stock recheck; release failed reservation          | Audit and mismatch metric                       |
+| Duplicate checkout           | Return original response                                                                         | Enforce idempotency replay; no second provider call              | Duplicate metric                                |
+| Razorpay API timeout/failure | Processing/unavailable status; never payment success                                             | Persist retry-safe pending state; reconcile via webhook          | Payment alert                                   |
+| Payment failure              | Show non-paid retry route where allowed                                                          | Mark attempt failed; no paid attribution                         | Failure metric/audit                            |
+| Webhook duplicate            | Successful already-processed acknowledgement                                                     | Deduplicate provider event ID                                    | Duplicate metric                                |
+| Invalid webhook signature    | Reject; no state change                                                                          | Record minimal rejected metadata                                 | Security alert policy                           |
+| Database timeout             | Retryable error with request ID                                                                  | Roll back; no partial cart/order/payment state                   | Database alert                                  |
+| Rate limiting                | 429 with retry hint                                                                              | Apply scoped quota                                               | Abuse/quota metric                              |
 
 ## Fallback hierarchy
 

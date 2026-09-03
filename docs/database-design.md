@@ -26,32 +26,32 @@ erDiagram
 
 ## Tables
 
-| Table | Key columns and constraints | Purpose |
-|---|---|---|
-| `tenants` | `id PK`, `slug UNIQUE`, `status CHECK`, timestamps | Merchant-account boundary |
-| `users` | `id PK`, `oidc_subject UNIQUE`, `email CITEXT UNIQUE`, `status` | Human identity; no password hashes |
-| `memberships` | tenant/user FKs, role, `UNIQUE(tenant_id,user_id)` | Tenant role assignment |
-| `storefronts` | tenant FK, `public_key UNIQUE`, status, allowed origins JSONB | Shopper channel configuration |
-| `products` | tenant FK, handle, title, status, attributes JSONB, unique tenant/handle | Merchant product |
-| `product_variants` | tenant/product FKs, SKU, `price_minor CHECK >=0`, currency, unique tenant/SKU | Sellable SKU |
-| `inventory_balances` | variant PK/FK, tenant FK, available/reserved `CHECK >=0`, version | Concurrency-controlled stock |
-| `product_embeddings` | tenant/product FK, vector embedding, model version, content-hash unique | Rebuildable retrieval projection |
-| `customers` | tenant FK, external ref, email hash, consent state, unique tenant/ref | Minimised shopper identity |
-| `shopper_sessions` | tenant/storefront/customer FKs, token hash unique, expiry | Opaque shopper session |
-| `conversations` | tenant/session FKs, status, locale | Conversation aggregate |
-| `conversation_messages` | tenant/conversation FK, actor, content/redacted content, sequence unique per conversation | Immutable history |
-| `recommendation_decisions` | tenant FK, source message nullable FK, context hash, policy/model version, explanation JSONB | Immutable explainable decision |
-| `recommendation_items` | decision/variant FKs, positive rank, score, reason codes, evidence JSONB | Ranked outputs |
-| `offers` | tenant FK, rule JSONB, discount type, status, active-range check | Merchant-defined upsell offer |
-| `carts`, `cart_items` | tenant/session FKs; positive quantity; cart/version | Basket aggregate and lines |
-| `orders`, `order_items` | tenant/cart FKs; order number unique; total checks; item price snapshots | Immutable purchase commitment |
-| `payment_attempts` | tenant/order FKs, provider, provider order/payment IDs unique, status, amount/currency | Payment lifecycle |
-| `payment_webhook_events` | provider event ID unique, signature validity, encrypted payload, processing outcome | Idempotent webhook ledger |
-| `experiments`, `experiment_assignments` | tenant/key unique; stable subject-hash assignment | Controlled experiments |
-| `commerce_events` | tenant, event name/time, session/decision/order FKs, idempotency key unique, JSONB properties | Append-only attribution stream |
-| `idempotency_keys` | tenant/key primary key, request hash, response, expiry | Safe write replay |
-| `outbox_events` | aggregate, event type/payload, publication/attempt fields | Transactional publication |
-| `audit_events` | tenant, actor/action/target, redacted before/after JSONB, request ID | Investigations and compliance |
+| Table                                   | Key columns and constraints                                                                   | Purpose                            |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `tenants`                               | `id PK`, `slug UNIQUE`, `status CHECK`, timestamps                                            | Merchant-account boundary          |
+| `users`                                 | `id PK`, `oidc_subject UNIQUE`, `email CITEXT UNIQUE`, `status`                               | Human identity; no password hashes |
+| `memberships`                           | tenant/user FKs, role, `UNIQUE(tenant_id,user_id)`                                            | Tenant role assignment             |
+| `storefronts`                           | tenant FK, `public_key UNIQUE`, status, allowed origins JSONB                                 | Shopper channel configuration      |
+| `products`                              | tenant FK, handle, title, status, attributes JSONB, unique tenant/handle                      | Merchant product                   |
+| `product_variants`                      | tenant/product FKs, SKU, `price_minor CHECK >=0`, currency, unique tenant/SKU                 | Sellable SKU                       |
+| `inventory_balances`                    | variant PK/FK, tenant FK, available/reserved `CHECK >=0`, version                             | Concurrency-controlled stock       |
+| `product_embeddings`                    | tenant/product FK, vector embedding, model version, content-hash unique                       | Rebuildable retrieval projection   |
+| `customers`                             | tenant FK, external ref, email hash, consent state, unique tenant/ref                         | Minimised shopper identity         |
+| `shopper_sessions`                      | tenant/storefront/customer FKs, token hash unique, expiry                                     | Opaque shopper session             |
+| `conversations`                         | tenant/session FKs, status, locale                                                            | Conversation aggregate             |
+| `conversation_messages`                 | tenant/conversation FK, actor, content/redacted content, sequence unique per conversation     | Immutable history                  |
+| `recommendation_decisions`              | tenant FK, source message nullable FK, context hash, policy/model version, explanation JSONB  | Immutable explainable decision     |
+| `recommendation_items`                  | decision/variant FKs, positive rank, score, reason codes, evidence JSONB                      | Ranked outputs                     |
+| `offers`                                | tenant FK, rule JSONB, discount type, status, active-range check                              | Merchant-defined upsell offer      |
+| `carts`, `cart_items`                   | tenant/session FKs; positive quantity; cart/version                                           | Basket aggregate and lines         |
+| `orders`, `order_items`                 | tenant/cart FKs; order number unique; total checks; item price snapshots                      | Immutable purchase commitment      |
+| `payment_attempts`                      | tenant/order FKs, provider, provider order/payment IDs unique, status, amount/currency        | Payment lifecycle                  |
+| `payment_webhook_events`                | provider event ID unique, signature validity, encrypted payload, processing outcome           | Idempotent webhook ledger          |
+| `experiments`, `experiment_assignments` | tenant/key unique; stable subject-hash assignment                                             | Controlled experiments             |
+| `commerce_events`                       | tenant, event name/time, session/decision/order FKs, idempotency key unique, JSONB properties | Append-only attribution stream     |
+| `idempotency_keys`                      | tenant/key primary key, request hash, response, expiry                                        | Safe write replay                  |
+| `outbox_events`                         | aggregate, event type/payload, publication/attempt fields                                     | Transactional publication          |
+| `audit_events`                          | tenant, actor/action/target, redacted before/after JSONB, request ID                          | Investigations and compliance      |
 
 ## Relationships and constraints
 
