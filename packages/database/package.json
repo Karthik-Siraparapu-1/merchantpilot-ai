@@ -2,6 +2,8 @@
   "name": "@merchantpilot/database",
   "version": "0.1.0",
   "private": true,
+  "main": "./generated/client/index.js",
+  "types": "./generated/client/index.d.ts",
   "scripts": {
     "build": "prisma generate",
     "lint": "prisma validate",
@@ -24,4 +26,3 @@
     "typescript": "^5.8.3"
   }
 }
-

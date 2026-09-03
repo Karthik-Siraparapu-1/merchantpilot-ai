@@ -68,6 +68,8 @@ CREATE TABLE "Merchant" (
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
+    "passwordHash" TEXT,
+    "refreshTokenHash" TEXT,
     "firstName" TEXT,
     "lastName" TEXT,
     "status" TEXT NOT NULL DEFAULT 'ACTIVE',
