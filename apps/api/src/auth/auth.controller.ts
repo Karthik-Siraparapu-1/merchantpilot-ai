@@ -22,7 +22,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'User & merchant registered successfully',
-    type: AuthResponseDto
+    type: () => AuthResponseDto
   })
   @ApiResponse({ status: 400, description: 'Validation failure' })
   @ApiResponse({ status: 409, description: 'Email or merchant slug already exists' })
@@ -34,7 +34,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authenticate merchant user and obtain JWT token pair' })
-  @ApiResponse({ status: 200, description: 'Login successful', type: AuthResponseDto })
+  @ApiResponse({ status: 200, description: 'Login successful', type: () => AuthResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid email or password' })
   async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(dto);
@@ -44,7 +44,11 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate refresh token and issue new JWT access token' })
-  @ApiResponse({ status: 200, description: 'Token rotation successful', type: AuthResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Token rotation successful',
+    type: () => AuthResponseDto
+  })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
   async refresh(@Body() dto: RefreshDto): Promise<AuthResponseDto> {
     return this.authService.refresh(dto);
@@ -64,7 +68,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current authenticated user profile and merchant roles' })
-  @ApiResponse({ status: 200, description: 'Current user profile details', type: UserProfileDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Current user profile details',
+    type: () => UserProfileDto
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@CurrentUser('id') userId: string): Promise<UserProfileDto> {
     return this.authService.getProfile(userId);

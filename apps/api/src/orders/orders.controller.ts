@@ -60,7 +60,7 @@ export class OrdersController {
   @ApiResponse({
     status: 201,
     description: 'Order created successfully',
-    type: OrderResponseDto
+    type: () => OrderResponseDto
   })
   @ApiResponse({ status: 400, description: 'Insufficient stock or invalid product' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -83,7 +83,7 @@ export class OrdersController {
   @ApiResponse({
     status: 200,
     description: 'Orders retrieved successfully',
-    type: OrderListResponseDto
+    type: () => OrderListResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -105,7 +105,7 @@ export class OrdersController {
   @ApiResponse({
     status: 200,
     description: 'Order details retrieved successfully',
-    type: OrderResponseDto
+    type: () => OrderResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -128,7 +128,7 @@ export class OrdersController {
   @ApiResponse({
     status: 200,
     description: 'Order status updated successfully',
-    type: OrderResponseDto
+    type: () => OrderResponseDto
   })
   @ApiResponse({ status: 400, description: 'Validation failure' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

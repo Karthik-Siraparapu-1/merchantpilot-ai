@@ -1,4 +1,23 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import dotenv from 'dotenv';
 import { z } from 'zod';
+
+const loadDotenv = (): void => {
+  const possiblePaths = [
+    resolve(process.cwd(), '.env'),
+    resolve(process.cwd(), '../../.env'),
+    resolve(process.cwd(), '../.env')
+  ];
+  for (const envPath of possiblePaths) {
+    if (existsSync(envPath)) {
+      dotenv.config({ path: envPath });
+      break;
+    }
+  }
+};
+
+loadDotenv();
 
 const runtimeEnvironmentSchema = z.enum(['development', 'test', 'production']);
 

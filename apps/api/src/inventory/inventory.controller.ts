@@ -59,7 +59,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Inventory items retrieved successfully',
-    type: InventoryListResponseDto
+    type: () => InventoryListResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -80,7 +80,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Low stock products retrieved successfully',
-    type: [InventoryResponseDto]
+    type: () => [InventoryResponseDto]
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -102,7 +102,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Inventory details retrieved successfully',
-    type: InventoryResponseDto
+    type: () => InventoryResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -125,7 +125,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Stock adjusted successfully',
-    type: InventoryResponseDto
+    type: () => InventoryResponseDto
   })
   @ApiResponse({ status: 400, description: 'Invalid quantity or would result in negative stock' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -150,7 +150,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Inventory parameters updated successfully',
-    type: InventoryResponseDto
+    type: () => InventoryResponseDto
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -175,7 +175,7 @@ export class InventoryController {
   @ApiResponse({
     status: 200,
     description: 'Audit history retrieved successfully',
-    type: [InventoryAuditLogDto]
+    type: () => [InventoryAuditLogDto]
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })

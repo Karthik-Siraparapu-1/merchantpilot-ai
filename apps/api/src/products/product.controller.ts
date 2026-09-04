@@ -59,7 +59,7 @@ export class ProductController {
   @ApiResponse({
     status: 201,
     description: 'Product created successfully',
-    type: ProductResponseDto
+    type: () => ProductResponseDto
   })
   @ApiResponse({ status: 400, description: 'Validation failure or invalid category/store ID' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -82,7 +82,7 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'List of products retrieved successfully',
-    type: ProductListResponseDto
+    type: () => ProductListResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -103,7 +103,7 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'Product retrieved successfully',
-    type: ProductResponseDto
+    type: () => ProductResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -125,7 +125,7 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'Product updated successfully',
-    type: ProductResponseDto
+    type: () => ProductResponseDto
   })
   @ApiResponse({ status: 400, description: 'Validation failure' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -157,7 +157,7 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'Product deleted or archived successfully',
-    type: DeleteProductResponseDto
+    type: () => DeleteProductResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })

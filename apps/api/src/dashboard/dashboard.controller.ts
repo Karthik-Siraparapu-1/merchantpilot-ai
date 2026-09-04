@@ -37,7 +37,7 @@ export class DashboardController {
   @ApiResponse({
     status: 200,
     description: 'Executive dashboard analytics retrieved successfully',
-    type: DashboardResponseDto
+    type: () => DashboardResponseDto
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
