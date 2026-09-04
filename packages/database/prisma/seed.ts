@@ -618,7 +618,7 @@ async function main() {
       messageId: shopperMessage.id,
       merchantId: merchant.id,
       experimentId: experiment.id,
-      variantId: activeVariant?.id,
+      variantId: activeVariant ? activeVariant.id : null,
       aiExecutionId: aiExecution.id,
       confidence: 0.94,
       explanation:
