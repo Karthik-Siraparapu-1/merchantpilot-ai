@@ -8,7 +8,8 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
-  ParseUUIDPipe
+  ParseUUIDPipe,
+  Inject
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -47,7 +48,7 @@ import {
 @Roles(UserRole.MERCHANT_OWNER, UserRole.MERCHANDISER, UserRole.PLATFORM_OPERATOR)
 @Controller('inventory')
 export class InventoryController {
-  constructor(private readonly inventoryService: InventoryService) {}
+  constructor(@Inject(InventoryService) private readonly inventoryService: InventoryService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)

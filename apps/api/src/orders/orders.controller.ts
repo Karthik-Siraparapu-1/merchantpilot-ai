@@ -9,7 +9,8 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
-  ParseUUIDPipe
+  ParseUUIDPipe,
+  Inject
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -48,7 +49,7 @@ import { OrderResponseDto, OrderListResponseDto } from './dto/order-response.dto
 )
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(@Inject(OrdersService) private readonly ordersService: OrdersService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

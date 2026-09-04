@@ -2,7 +2,8 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
-  NotFoundException
+  NotFoundException,
+  Inject
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole, StoreStatus } from '@merchantpilot/database';
@@ -18,8 +19,8 @@ const SALT_ROUNDS = 12;
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(JwtService) private readonly jwtService: JwtService
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {

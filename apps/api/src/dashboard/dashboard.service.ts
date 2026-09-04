@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { OrderStatus, ProductStatus } from '@merchantpilot/database';
 import { PrismaService } from '../common/prisma.service';
 import {
@@ -16,7 +16,7 @@ const revenueStatuses: OrderStatus[] = [
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async getMetrics(tenantId: string): Promise<DashboardResponseDto> {
     const startOfToday = new Date();

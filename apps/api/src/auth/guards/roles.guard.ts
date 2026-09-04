@@ -6,7 +6,12 @@ import type { AuthenticatedUserPayload } from '../decorators/current-user.decora
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  private readonly reflector: Reflector;
+
+  constructor(reflector?: Reflector) {
+    this.reflector =
+      reflector && typeof reflector.getAllAndOverride === 'function' ? reflector : new Reflector();
+  }
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [

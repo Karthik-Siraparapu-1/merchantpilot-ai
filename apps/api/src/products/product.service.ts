@@ -2,7 +2,8 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-  BadRequestException
+  BadRequestException,
+  Inject
 } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@merchantpilot/database';
 import { PrismaService } from '../common/prisma.service';
@@ -44,7 +45,7 @@ const productInclude = {
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   /**
    * Create a new product scoped to the merchant's store

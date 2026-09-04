@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { Prisma, ProductStatus, AuditAction, ActorType } from '@merchantpilot/database';
 import { PrismaService } from '../common/prisma.service';
@@ -23,7 +23,7 @@ const productSelect = {
 
 @Injectable()
 export class InventoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   /**
    * Format raw Prisma inventory record into enriched response DTO
