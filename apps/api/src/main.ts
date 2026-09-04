@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './products/product.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { OrdersModule } from './orders/orders.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 
 @Controller('health')
@@ -25,7 +26,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [AuthModule, ProductModule, InventoryModule, OrdersModule],
+  imports: [AuthModule, ProductModule, InventoryModule, OrdersModule, DashboardModule],
   controllers: [HealthController]
 })
 class AppModule {}
