@@ -8,6 +8,7 @@ import type { HealthStatus } from '@merchantpilot/contracts';
 import { createLogger } from '@merchantpilot/observability';
 import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './products/product.module';
+import { InventoryModule } from './inventory/inventory.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 
 @Controller('health')
@@ -23,7 +24,7 @@ class HealthController {
 }
 
 @Module({
-  imports: [AuthModule, ProductModule],
+  imports: [AuthModule, ProductModule, InventoryModule],
   controllers: [HealthController]
 })
 class AppModule {}
