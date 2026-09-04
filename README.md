@@ -1,125 +1,250 @@
 # MerchantPilot AI
 
-MerchantPilot AI is an explainable AI commerce platform for Indian merchants. It turns browsing and purchase intent into measurable revenue opportunities through conversational shopping, product recommendations, intelligent upsells, and Razorpay Test Mode payment flows.
+> **Explainable AI Commerce Platform for Modern Retail & Indian D2C Merchants**
+> Turning browsing and purchase intent into high-converting, measurable revenue opportunities through conversational shopping, explainable recommendations, transactional order orchestration, and robust multi-tenant guardrails.
 
-## Problem statement
+---
 
-Merchants often have product data and transaction data but no trustworthy, actionable layer that connects customer intent to a better basket. Generic recommendations are hard to inspect, manual merchandising does not scale, and checkout experiences rarely use contextual upsell opportunities. MerchantPilot AI makes those decisions visible, controlled, and measurable.
+## 📑 Table of Contents
 
-## Objectives
+- [Overview](#overview)
+- [System Architecture](#system-architecture)
+- [Core Modules & Capabilities](#core-modules--capabilities)
+- [Security & Multi-Tenant Isolation](#security--multi-tenant-isolation)
+- [API Reference & Swagger](#api-reference--swagger)
+- [Tech Stack](#tech-stack)
+- [Monorepo Structure](#monorepo-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation & Environment Setup](#installation--environment-setup)
+  - [Database Migration & Seeding](#database-migration--seeding)
+  - [Running the Services](#running-the-services)
+- [Verification & Quality Gates](#verification--quality-gates)
+- [Roadmap & Next Steps](#roadmap--next-steps)
 
-- Help merchants increase conversion rate, average order value, and repeat purchase rate.
-- Give shoppers relevant conversational discovery and recommendations without opaque automation.
-- Give merchant teams controls, explanations, experiment results, and audit trails.
-- Integrate a safe, idempotent checkout flow using Razorpay Test Mode APIs during the buildathon.
-- Establish production-quality foundations for security, observability, and long-term maintenance.
+---
 
-## Features
+## 🌟 Overview
 
-- Multi-tenant merchant workspace, catalog, inventory, and storefront configuration.
-- Conversational shopping assistant grounded in merchant-approved catalog data.
-- Explainable product recommendations and basket-aware upsell offers.
-- Merchant controls for recommendation policy, offer eligibility, and AI knowledge sources.
-- Event instrumentation, experimentation, revenue attribution, and decision audit history.
-- Razorpay Test Mode order creation, payment verification, webhook processing, and refunds model.
-- Role-based access control, tenant isolation, and operational audit logs.
+Merchants typically sit on vast product catalogs and transaction histories without a trustworthy, automated layer that connects customer intent to higher basket values.
 
-## Target users
+**MerchantPilot AI** bridges this gap:
 
-- **Merchant owner:** configures the store, reviews revenue impact, and controls commercial policy.
-- **Merchandiser/growth manager:** curates catalog, offers, and experiments.
-- **Support agent:** inspects shopper conversations and order state without changing payment controls.
-- **Shopper:** discovers products, receives relevant suggestions, and checks out securely.
-- **Platform operator:** supports tenants, monitors integrations, and investigates incidents.
+1. **Explainable AI Decisions**: Every recommendation comes with human-readable rationale and merchant policy auditability.
+2. **Transactional Integrity**: Atomic order placement with automatic stock reservation, deduction, and automated replenishment on cancellations.
+3. **Multi-Tenant Security**: Strict tenant isolation across merchants, stores, roles, and resources.
+4. **Actionable Analytics**: Real-time revenue metrics, order velocity, inventory health, and top-selling product insights.
 
-## Technology stack
+---
 
-The planned stack is Next.js with TypeScript for the web experience, NestJS for the core API, Python/FastAPI for isolated AI inference and retrieval, PostgreSQL as the transactional system of record, Redis for cache and rate limiting, and a worker queue for asynchronous work. Details and alternatives are in [docs/tech-stack.md](docs/tech-stack.md).
+## 🏛️ System Architecture
 
-## Architecture summary
+```mermaid
+flowchart TB
+    subgraph ClientLayer["Frontend & Client Layer"]
+        WebConsole["Next.js Merchant Console<br/>(Admin & Analytics)"]
+        Storefront["Shopper Storefront<br/>(Conversational UI)"]
+    end
 
-MerchantPilot AI is a modular, multi-tenant system. The frontend communicates only with a versioned REST API. The API owns business workflows and persists authoritative commerce data in PostgreSQL. An isolated AI service performs retrieval, ranking, and generation against approved data, returning structured decisions with explanations. Webhooks and analytical work are handled asynchronously. See [docs/architecture.md](docs/architecture.md).
+    subgraph APILayer["NestJS Modular Monolith (:3001)"]
+        Gateway["Global Auth & Tenant Interceptors<br/>(JWT + RolesGuard + TenantGuard)"]
 
-## Folder structure
+        subgraph CoreModules["Core Domain Modules"]
+            AuthMod["Auth & RBAC Module"]
+            ProductMod["Product Management"]
+            InventoryMod["Inventory & Stock Adjustments"]
+            OrderMod["Orders (Prisma $transaction)"]
+            DashboardMod["Dashboard Analytics"]
+        end
+
+        Gateway --> AuthMod
+        Gateway --> ProductMod
+        Gateway --> InventoryMod
+        Gateway --> OrderMod
+        Gateway --> DashboardMod
+    end
+
+    subgraph DataLayer["Persistence & Infrastructure"]
+        PostgreSQL[("PostgreSQL Database<br/>(Authoritative Ledger)")]
+        RedisCache[("Redis<br/>(Rate Limiting & Caching)")]
+        AuditStore[("Audit Logs & Event Ledger")]
+    end
+
+    WebConsole -->|REST / OpenAPI| Gateway
+    Storefront -->|REST / OpenAPI| Gateway
+
+    ProductMod --> PostgreSQL
+    InventoryMod --> PostgreSQL
+    OrderMod -->|Atomic Transaction| PostgreSQL
+    OrderMod --> AuditStore
+    DashboardMod --> PostgreSQL
+```
+
+---
+
+## 📦 Core Modules & Capabilities
+
+| Module          | Endpoints                                                                                                                                                  | Key Capabilities                                                                                                                                                                                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Auth & RBAC** | `POST /auth/register`<br/>`POST /auth/login`<br/>`POST /auth/refresh`<br/>`GET /auth/me`                                                                   | Argon2 hashing, dual JWT tokens (Access + Refresh rotation), Role hierarchy (`MERCHANT_OWNER`, `MERCHANDISER`, `SUPPORT_AGENT`, `PLATFORM_OPERATOR`).                                                                                |
+| **Products**    | `POST /products`<br/>`GET /products`<br/>`GET /products/:id`<br/>`PATCH /products/:id`<br/>`DELETE /products/:id`                                          | Multi-tenant catalog CRUD, SKU uniqueness validation per store, Category relations, status lifecycle (`DRAFT`, `ACTIVE`, `OUT_OF_STOCK`, `ARCHIVED`), pagination & keyword search.                                                   |
+| **Inventory**   | `GET /inventory`<br/>`GET /inventory/low-stock`<br/>`GET /inventory/:productId`<br/>`PATCH /inventory/:productId/adjust`<br/>`PATCH /inventory/:productId` | Atomic delta/absolute adjustments, reorder threshold alerts, automatic stock exhaustion detection, audit logging of quantity shifts.                                                                                                 |
+| **Orders**      | `POST /orders`<br/>`GET /orders`<br/>`GET /orders/:id`<br/>`PATCH /orders/:id/status`                                                                      | **`prisma.$transaction`** orchestration: validates catalog & store, ensures stock availability, atomically decrements stock, updates product status on depletion, records audit log, and handles inventory rollback on cancellation. |
+| **Dashboard**   | `GET /dashboard`                                                                                                                                           | High-level merchant metrics: Today's & Total Revenue, Order counts, Catalog size, Low-stock alerts, Top-selling products by quantity, and Recent order activity.                                                                     |
+
+---
+
+## 🔒 Security & Multi-Tenant Isolation
+
+MerchantPilot AI implements strict multi-tenancy at the gateway and repository levels:
+
+1. **Authentication Guard (`JwtAuthGuard`)**: Validates the JWT bearer token, extracts user ID, merchant ID, store ID, and assigned roles.
+2. **Tenant Guard (`TenantGuard`)**: Ensures the requested store or merchant belongs strictly to the authenticated context. Prevents cross-tenant data leakage.
+3. **Roles Guard (`RolesGuard`)**: Enforces granular permissions on write endpoints (e.g. `MERCHANT_OWNER` or `MERCHANDISER` required for catalog modifications; `SUPPORT_AGENT` has read-only access).
+
+---
+
+## 📖 API Reference & Swagger
+
+Interactive Swagger/OpenAPI documentation is automatically generated and accessible when running the API:
+
+- **Swagger UI**: [http://localhost:3001/api/docs](http://localhost:3001/api/docs)
+- **OpenAPI JSON**: [http://localhost:3001/api/docs-json](http://localhost:3001/api/docs-json)
+
+---
+
+## 💻 Tech Stack
+
+- **Monorepo Engine:** [Turborepo](https://turbo.build/) + [pnpm](https://pnpm.io/)
+- **Backend API:** [NestJS](https://nestjs.com/) (Node.js / TypeScript)
+- **Database & ORM:** [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
+- **Validation & Serialization:** `class-validator`, `class-transformer`
+- **Security:** `@nestjs/jwt`, `argon2`, `passport-jwt`
+- **Testing:** [Vitest](https://vitest.dev/)
+- **Code Quality:** ESLint, Prettier, Husky, lint-staged
+
+---
+
+## 📂 Monorepo Structure
 
 ```text
 merchantpilot-ai/
 ├── apps/
-│   ├── web/                 # Next.js merchant console and shopper surfaces
-│   ├── api/                 # NestJS modular monolith
-│   ├── ai-service/          # FastAPI retrieval, ranking, and explanation service
-│   └── worker/              # asynchronous jobs and webhook follow-up
+│   ├── api/                     # NestJS modular backend service
+│   │   └── src/
+│   │       ├── auth/            # JWT authentication, hashing, guards
+│   │       ├── products/        # Product catalog & CRUD management
+│   │       ├── inventory/       # Stock tracking & low-stock alerts
+│   │       ├── orders/          # Transactional order engine
+│   │       ├── dashboard/       # Merchant analytics & KPI aggregation
+│   │       └── common/          # Global filters, decorators, interceptors
+│   ├── web/                     # Next.js frontend console (Merchant portal)
+│   ├── ai-service/              # FastAPI retrieval & explanation service
+│   └── worker/                  # Asynchronous task processor & webhooks
 ├── packages/
-│   ├── contracts/           # versioned API and event contracts
-│   ├── domain/              # domain types and invariants
-│   ├── config/              # validated shared configuration
-│   └── observability/       # logging, tracing, metrics conventions
-├── infrastructure/          # IaC and deployment manifests (introduced later)
-├── docs/
+│   ├── database/                # Prisma schema, migrations, seed script, client
+│   ├── contracts/               # Shared DTOs and API interface contracts
+│   ├── config/                  # Shared environment and config parsers
+│   └── observability/           # Logging & tracing utilities
+├── docs/                        # Architecture & design specifications
 └── README.md
 ```
 
-This is the target structure, not scaffolded code. Each deployable application maintains dependency direction toward domain contracts and never imports presentation concerns into the domain layer.
+---
 
-## Development workflow
-
-1. Record an approved architecture decision when a cross-cutting decision changes.
-2. Design contracts, database migration, authorization rules, and observability before implementation.
-3. Implement vertical slices behind feature flags with unit, integration, and end-to-end coverage.
-4. Require review for domain changes, security-sensitive code, schema migrations, and payment workflows.
-5. Release progressively; monitor business and technical signals; retain rollback capability.
-
-## Roadmap
-
-Milestones, dependencies, and complexity are defined in [docs/roadmap.md](docs/roadmap.md). The first implementation phase begins only after this architecture is approved.
-
-## Local development
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 22 or later and Corepack-managed pnpm 10.6.5.
-- Python 3.12 or later for the FastAPI service.
-- Docker Desktop or a compatible Docker Engine for PostgreSQL and Redis.
+- **Node.js**: `v22.x` or later
+- **pnpm**: `v10.x` or later (`corepack enable pnpm`)
+- **Docker** & **Docker Compose** (for PostgreSQL)
 
-### Bootstrap
+### Installation & Environment Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Karthik-Siraparapu-1/merchantpilot-ai.git
+   cd merchantpilot-ai
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure environment variables:**
+   ```bash
+   cp .env.example .env
+   ```
+
+### Database Migration & Seeding
+
+1. **Start the PostgreSQL database:**
+
+   ```bash
+   docker compose up -d postgres
+   ```
+
+2. **Generate Prisma Client & Run Migrations:**
+
+   ```bash
+   pnpm --filter @merchantpilot/database db:generate
+   pnpm --filter @merchantpilot/database db:migrate
+   ```
+
+3. **Seed rich sample data (20 products, categories, inventories, realistic orders):**
+   ```bash
+   pnpm --filter @merchantpilot/database db:seed
+   ```
+
+### Running the Services
+
+Start the development server with Turbo:
 
 ```bash
-corepack pnpm install
-cp .env.example .env
-docker compose up -d postgres redis
-corepack pnpm build
-corepack pnpm dev
+pnpm dev
 ```
 
-The shared TypeScript configuration validates database and Redis URLs at API and worker startup. Copy service-specific templates when overrides are needed: `apps/web/.env.example`, `apps/api/.env.example`, `apps/worker/.env.example`, and `apps/ai-service/.env.example`. Do not add credentials to source control; use Razorpay Test Mode credentials only.
-
-The FastAPI service is isolated as a Python project. Create an environment and install its declared development requirements before serving it:
+Or run the NestJS API specifically:
 
 ```bash
-python3 -m venv apps/ai-service/.venv
-apps/ai-service/.venv/bin/pip install -r apps/ai-service/requirements-dev.txt
-apps/ai-service/.venv/bin/uvicorn merchantpilot_ai.main:app --app-dir apps/ai-service/src --port 8000
+pnpm --filter @merchantpilot/api dev
 ```
 
-### Quality commands
+API will be live at `http://localhost:3001` with Swagger docs at `http://localhost:3001/api/docs`.
+
+---
+
+## 🧪 Verification & Quality Gates
+
+The project maintains 100% test passing and strict code quality:
 
 ```bash
-corepack pnpm format
-corepack pnpm lint
-corepack pnpm typecheck
-corepack pnpm build
+# Run all unit and controller tests
+pnpm --filter @merchantpilot/api test
+
+# Run typechecking
+pnpm --filter @merchantpilot/api typecheck
+
+# Run lint checks
+pnpm --filter @merchantpilot/api lint
+
+# Build production bundle
+pnpm --filter @merchantpilot/api build
 ```
 
-The CI workflow runs formatting verification, linting, type checking, and builds on pull requests and `main` updates. Environment-variable contracts and the deployment strategy remain documented in [docs/deployment.md](docs/deployment.md).
+---
 
-## Contributing
+## 🗺️ Roadmap & Next Steps
 
-- Keep changes small, reviewable, and tied to an issue or approved milestone.
-- Preserve layer boundaries and update contracts, migrations, and documentation together.
-- Add tests at the appropriate boundary; do not merge failing checks or unreviewed security changes.
-- Never commit secrets, production data, payment payloads, or personally identifiable information.
-- Use conventional commits and require at least one reviewer for non-trivial changes.
-
-## License
-
-Licensed under the [MIT License](LICENSE).
+- [x] Multi-tenant Authentication & Role-Based Access Control
+- [x] Product Management with Category & SKU integrity
+- [x] Inventory Management with low-stock detection & atomic adjustments
+- [x] Transactional Orders Engine with automatic stock deduction & audit trails
+- [x] Merchant Dashboard Analytics (`/dashboard`)
+- [x] Database Seeder with 20 rich catalog products & sample orders
+- [ ] Razorpay Test Mode Payment Gateway Webhook integration
+- [ ] AI-Powered Explainable Recommendation & Upsell microservice integration
