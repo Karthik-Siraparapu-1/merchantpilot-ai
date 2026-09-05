@@ -117,8 +117,11 @@ export class VoiceAIEngine {
           this.notifyState();
 
           const lastResult = event.results[event.results.length - 1];
-          if (lastResult?.isFinal && this.onCommandRecognized) {
+          if (lastResult?.isFinal) {
             const finalCommand = currentTranscript.trim();
+            if (this.onCommandRecognized) {
+              this.onCommandRecognized(finalCommand);
+            }
             void this.handleFinalCommand(finalCommand);
           }
         };
