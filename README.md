@@ -6,6 +6,8 @@
 
 **Autonomous digital employees that analyze, reason, forecast, protect, and execute commerce operations.**
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-merchantpilot--ai--web.vercel.app-6366f1?style=for-the-badge&logo=vercel)](https://merchantpilot-ai-web.vercel.app)
+
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
@@ -15,10 +17,10 @@
 
 ---
 
-### 🔑 Demo Sandbox Credentials
+### 🌐 Live Production Application & Demo Sandbox
 
-> **Store Executive Portal:** `http://localhost:3000/login`  
-> **Email:** `demo@merchantpilot.ai`  
+> **Live Web App:** [https://merchantpilot-ai-web.vercel.app](https://merchantpilot-ai-web.vercel.app)  
+> **Executive Login:** `demo@merchantpilot.ai`  
 > **Password:** `Demo@123!`
 
 ---
