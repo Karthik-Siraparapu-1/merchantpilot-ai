@@ -33,90 +33,124 @@ MerchantPilot AI replaces static e-commerce dashboards with an **autonomous digi
 
 ## 🏛️ System Architecture
 
-```
-                               +-----------------------------------+
-                               |     Next.js 16 Web Frontend       |
-                               | (TailwindCSS, Framer Motion, App) |
-                               +-----------------+-----------------+
-                                                 |
-                                                 v  HTTPS / REST
-                               +-----------------+-----------------+
-                               |    NestJS Backend API Gateway     |
-                               | (JWT Auth, Multi-Tenant RLS)      |
-                               +-----------------+-----------------+
-                                                 |
-                                                 v
-                   +-----------------------------+-----------------------------+
-                   |                                                           |
-                   v                                                           v
-+------------------+------------------+                     +------------------+------------------+
-|       AI Digital Workforce Mesh     |                     |    PostgreSQL + Prisma Data Layer     |
-| - Athena   (Strategy & Chief of Staff)| <-----------------> | - Multi-Tenant Tenant Isolation  |
-| - Atlas    (Inventory Velocity & PO)|    Sub-Second       | - Active Catalog & Orders Schema |
-| - Vega     (Dynamic Elasticity)     |    Inference        +------------------+------------------+
-| - Sentinel (Ingress Fraud Risk)     |                                        ^
-| - Pulse    (Checkout Payments)      |                                        |
-| - Orion    (Customer Churn & LTV)   |                                        v
-| - Nova     (Marketing Campaigns)    |                     +------------------+------------------+
-+------------------+------------------+                     |     Redis Pub/Sub Event Bus      |
-                   |                                        | - Live Reasoning & Activity Log  |
-                   v                                        +----------------------------------+
-+------------------+------------------+
-|   Deterministic Rollback Engine     |
-| - 1-Click Undo Mutation Log         |
-+-------------------------------------+
+```mermaid
+graph TD
+    %% Node Definitions
+    UI["💻 Next.js 16 Web Frontend<br/><i>(TailwindCSS, Framer Motion, App Router)</i>"]
+    API["⚡ NestJS Backend API Gateway<br/><i>(JWT Auth, Multi-Tenant RLS)</i>"]
+
+    subgraph AI_Mesh["🤖 AI Digital Workforce Mesh"]
+        Athena["👑 Athena (Strategy & Chief of Staff)"]
+        Atlas["📦 Atlas (Inventory Velocity & POs)"]
+        Vega["🏷️ Vega (Dynamic Price Elasticity)"]
+        Sentinel["🛡️ Sentinel (Ingress Fraud Risk)"]
+        Pulse["⚡ Pulse (Checkout Payment Routing)"]
+        Orion["🎯 Orion (Customer Retention & LTV)"]
+        Nova["🚀 Nova (Marketing AI Campaigns)"]
+    end
+
+    DB[("🛢️ PostgreSQL + Prisma Data Layer<br/><i>(Multi-Tenant Isolation & Catalog Schema)</i>")]
+    BUS["📡 Redis Pub/Sub Event Bus<br/><i>(Live Reasoning & Activity Log Stream)</i>"]
+    ROLLBACK["↺ Deterministic Rollback Engine<br/><i>(1-Click Undo Mutation Log)</i>"]
+
+    %% Connections
+    UI -->|HTTPS / REST / WebSocket| API
+    API --> AI_Mesh
+    API --> DB
+    AI_Mesh <-->|Sub-Second Inference| DB
+    DB <--> BUS
+    AI_Mesh --> ROLLBACK
 ```
 
 ---
 
 ## 🤖 AI Workforce Hierarchy
 
+```mermaid
+graph TD
+    CEO["👤 Merchant Store CEO<br/><i>(Human Executive Oversight)</i>"]
+    ATHENA["👑 Athena<br/><i>(Chief of Staff & Strategic Verdicts)</i>"]
+
+    ATLAS["📦 Atlas<br/><i>Inventory Velocity & POs</i>"]
+    VEGA["🏷️ Vega<br/><i>Dynamic Price Elasticity</i>"]
+    SENTINEL["🛡️ Sentinel<br/><i>Ingress Fraud Risk</i>"]
+    PULSE["⚡ Pulse<br/><i>Checkout Payment Routing</i>"]
+    ORION["🎯 Orion<br/><i>Customer Churn & LTV</i>"]
+    NOVA["🚀 Nova<br/><i>Marketing & VIP Blasts</i>"]
+
+    CEO -->|Configures Strategy & Autonomy Level| ATHENA
+    ATHENA -->|Delegates Autonomous PO Tasks| ATLAS
+    ATHENA -->|Delegates Price Adjustments| VEGA
+    ATHENA -->|Delegates Fraud Holds| SENTINEL
+    ATHENA -->|Delegates Route Optimizations| PULSE
+    ATHENA -->|Delegates VIP Retention| ORION
+    ATHENA -->|Delegates Campaign Triggers| NOVA
 ```
-                            +-----------------------------------+
-                            |       Merchant Store CEO          |
-                            |    (Human Executive Oversight)    |
-                            +-----------------+-----------------+
-                                              |
-                                              v
-                            +-----------------+-----------------+
-                            |   Athena (Chief of Staff)         |
-                            |   Strategic Consensus & Verdicts  |
-                            +-----------------+-----------------+
-                                              |
-        +------------------+------------------+------------------+------------------+
-        |                  |                  |                  |                  |
-        v                  v                  v                  v                  v
-+-------+-------+  +-------+-------+  +-------+-------+  +-------+-------+  +-------+-------+
-|     Atlas     |  |     Vega      |  |   Sentinel    |  |     Pulse     |  |     Nova      |
-| Inventory POs |  | Dynamic Price |  |  Fraud Risk   |  | Checkout Pay  |  | VIP Campaigns |
-+---------------+  +---------------+  +---------------+  +---------------+  +---------------+
+
+---
+
+## 🔄 Autonomous Multi-Agent Decision Pattern
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Merchant as 👤 Merchant CEO
+    participant Athena as 👑 Athena (Chief of Staff)
+    participant Atlas as 📦 Atlas (Inventory)
+    participant Vega as 🏷️ Vega (Pricing)
+    participant DB as 🛢️ Multi-Tenant DB
+    participant Rollback as ↺ Rollback Engine
+
+    Merchant->>Athena: Prompt / Auto-Trigger ("Optimize Revenue & Stock")
+    Athena->>Atlas: Request Stock Velocity & Out-of-Stock Risk
+    Atlas-->>Athena: Stock Alert: Low stock on Laptop Stand (12 units left)
+    Athena->>Vega: Request Elasticity Check & Competitor Price Scrape
+    Vega-->>Athena: Optimal Strategy: Restock 80 units & Price +4.5%
+
+    rect rgb(30, 30, 45)
+        note over Athena,Vega: Multi-Agent Debate & Verdict Synthesis
+        Athena->>Athena: Calculate Combined Confidence Score (96%)
+    end
+
+    alt AutoPilot Autonomy = Semi-Autonomous (Approval Required)
+        Athena->>Merchant: Present Action Plan in AI Action Center
+        Merchant->>Athena: Approve Transaction
+    else AutoPilot Autonomy = Fully Autonomous
+        Athena->>Athena: Auto-Approve Policy Enforced
+    end
+
+    Athena->>DB: Execute Catalog Mutation & Update Stock
+    Athena->>Rollback: Register Undo State (1-Click Undo Enabled)
+    DB-->>Merchant: Real-Time UI Stream & Continuous Thinking Ticker Updated
 ```
 
 ---
 
 ## 🤖 Digital Executive Roster
 
-| Agent | Name | Role & Specialization | Key Metrics Handled |
-| --- | --- | --- | --- |
-| 👑 | **Athena** | Chief of Staff & Strategy | Business Health Score (95/100), Executive Verdicts |
-| 📦 | **Atlas** | Inventory & PO Specialist | Safety Stock, Out-of-Stock Reduction, Lead Times |
-| 🏷️ | **Vega** | Dynamic Pricing & Elasticity | Monte Carlo Curves, Gross Margin Lift % |
-| 🛡️ | **Sentinel** | Fraud & Security Sentinel | IP/VPN Ingress Scoring, Fraud Holds |
-| ⚡ | **Pulse** | Checkout Payment Intelligence | Gateway Routing (Razorpay/Cashfree/PayU SLA) |
-| 🎯 | **Orion** | Customer Retention & LTV | RFM Matrix, Customer Lifetime Value (LTV) |
-| 🚀 | **Nova** | Marketing & Campaign AI | WhatsApp VIP Blasts, Promotional Coupons |
+| Agent | Name         | Role & Specialization         | Key Metrics Handled                                |
+| ----- | ------------ | ----------------------------- | -------------------------------------------------- |
+| 👑    | **Athena**   | Chief of Staff & Strategy     | Business Health Score (95/100), Executive Verdicts |
+| 📦    | **Atlas**    | Inventory & PO Specialist     | Safety Stock, Out-of-Stock Reduction, Lead Times   |
+| 🏷️    | **Vega**     | Dynamic Pricing & Elasticity  | Monte Carlo Curves, Gross Margin Lift %            |
+| 🛡️    | **Sentinel** | Fraud & Security Sentinel     | IP/VPN Ingress Scoring, Fraud Holds                |
+| ⚡    | **Pulse**    | Checkout Payment Intelligence | Gateway Routing (Razorpay/Cashfree/PayU SLA)       |
+| 🎯    | **Orion**    | Customer Retention & LTV      | RFM Matrix, Customer Lifetime Value (LTV)          |
+| 🚀    | **Nova**     | Marketing & Campaign AI       | WhatsApp VIP Blasts, Promotional Coupons           |
 
 ---
 
 ## Feature Capabilities
 
 ### ⚡ AI & Autonomous Operations
+
 - **Multi-Agent Debate Engine:** Deliberative cross-examination between agents before executive verdicts.
 - **Action Preview Modal:** Pre-execution simulation showing exact revenue, margin, and risk impact.
 - **Deterministic Rollback:** Git-like 1-click undo capability for all automated catalog mutations.
 - **Hands-Free Voice AI:** Hands-free speech interaction with live state transitions (`Listening` -> `Transcribing` -> `Reasoning` -> `Executing`).
 
 ### 🔒 Enterprise & Security
+
 - **Multi-Tenant Data Isolation:** Row Level Security (RLS) and AES-256 data partitioning.
 - **AI AutoPilot Governance:** Per-domain autonomy configuration (`Manual`, `Semi-Auto`, `Fully Autonomous`).
 - **Trust Center (`/trust`):** Real-time model accuracy metrics (98.4%), sub-second 420ms decision latency, and SOC2 readiness badges.
