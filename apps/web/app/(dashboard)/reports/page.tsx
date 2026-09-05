@@ -8,6 +8,9 @@ import { Download, Printer, Sparkles, CheckCircle2 } from 'lucide-react';
 import { reportsEngine, type ExecutiveReport } from '@/lib/ai/reports-engine';
 import { toast } from 'sonner';
 
+import { downloadRawCsvString, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
+
 export default function ReportsPage() {
   const [selectedType, setSelectedType] = useState<
     'CEO_BRIEF' | 'INVESTOR_UPDATE' | 'DAILY_OPERATIONS' | 'WEEKLY_FINANCIALS'
@@ -25,24 +28,23 @@ export default function ReportsPage() {
   };
 
   const handleDownloadCsv = () => {
-    const encodedUri = encodeURI(activeReport.csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${activeReport.id}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadRawCsvString(`${activeReport.id}.csv`, activeReport.csvContent);
     toast.success('Executive report CSV downloaded!');
   };
 
   const handlePrint = () => {
-    window.print();
+    triggerPrintView(activeReport.title);
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto printable-area">
+      <PrintHeader
+        title={activeReport.title}
+        subtitle={`Prepared for: ${activeReport.preparedFor}`}
+      />
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="secondary" className="gap-1 text-xs">
@@ -74,7 +76,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-border/70 pb-3 overflow-x-auto">
+      <div className="flex gap-2 border-b border-border/70 pb-3 overflow-x-auto no-print">
         {[
           { id: 'CEO_BRIEF', label: 'CEO Morning Brief' },
           { id: 'INVESTOR_UPDATE', label: 'Investor & Board Update' },

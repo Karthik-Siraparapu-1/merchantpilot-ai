@@ -24,6 +24,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 
+import { downloadCsvFile, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
+import { Printer } from 'lucide-react';
+
 export default function AnalyticsPage() {
   const { activeTenantId } = useAuth();
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | 'all'>('7d');
@@ -38,6 +42,24 @@ export default function AnalyticsPage() {
     queryFn: () => api.dashboard.getMetrics(),
     enabled: !!activeTenantId
   });
+
+  const handleExport = () => {
+    if (!metrics) return;
+    const headers = ['Metric', 'Value'];
+    const rows = [
+      ['Today Revenue', `₹${metrics.revenue.todayRevenueMinor / 100}`],
+      ['Total Revenue', `₹${metrics.revenue.totalRevenueMinor / 100}`],
+      ['Total Orders', metrics.orders.totalOrders],
+      ['Units in Stock', metrics.inventory.totalUnitsInStock],
+      ['Active Products', metrics.products.activeProducts]
+    ];
+    downloadCsvFile(`merchantpilot_analytics_${Date.now()}`, headers, rows);
+    toast.success('Analytics CSV report downloaded!');
+  };
+
+  const handlePrint = () => {
+    triggerPrintView('MerchantPilot AI — Commerce Analytics Telemetry');
+  };
 
   if (isLoading) {
     return (
@@ -96,32 +118,15 @@ export default function AnalyticsPage() {
     { name: 'Pending', value: metrics.orders.pendingOrders }
   ];
 
-  const handleExport = () => {
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      'Metric,Value\n' +
-      `Today Revenue,₹${metrics.revenue.todayRevenueMinor / 100}\n` +
-      `Total Revenue,₹${metrics.revenue.totalRevenueMinor / 100}\n` +
-      `Total Orders,${metrics.orders.totalOrders}\n` +
-      `Units in Stock,${metrics.inventory.totalUnitsInStock}\n` +
-      `Active Products,${metrics.products.activeProducts}\n`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute(
-      'download',
-      `merchantpilot-analytics-${new Date().toISOString().slice(0, 10)}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('Analytics CSV report downloaded!');
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 printable-area">
+      <PrintHeader
+        title="COMMERCE ANALYTICS & EXECUTIVE TELEMETRY"
+        subtitle="Enterprise store metrics, gross merchandise velocity, and supply chain health"
+      />
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Commerce Analytics & Telemetry
@@ -148,8 +153,16 @@ export default function AnalyticsPage() {
               </button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={handleExport} className="shadow-xs">
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Export Report
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrint}
+            className="shadow-xs gap-1.5 h-9 text-xs"
+          >
+            <Printer className="h-3.5 w-3.5" /> Print Analytics
+          </Button>
+          <Button size="sm" onClick={handleExport} className="shadow-xs gap-1.5 h-9 text-xs">
+            <Download className="h-3.5 w-3.5" /> Export CSV
           </Button>
         </div>
       </div>

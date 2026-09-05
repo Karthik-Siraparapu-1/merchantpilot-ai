@@ -47,6 +47,10 @@ import {
   SelectItem
 } from '@/components/ui/select';
 
+import { downloadCsvFile, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
+import { Download, Printer } from 'lucide-react';
+
 export default function OrdersPage() {
   const { activeTenantId } = useAuth();
   const queryClient = useQueryClient();
@@ -70,6 +74,39 @@ export default function OrdersPage() {
   const [customerFirstName, setCustomerFirstName] = useState('Aarav');
   const [customerLastName, setCustomerLastName] = useState('Patel');
   const [orderItems, setOrderItems] = useState<Array<{ productId: string; quantity: number }>>([]);
+
+  const handleExportCsv = () => {
+    if (!data?.data || data.data.length === 0) {
+      toast.error('No orders to export.');
+      return;
+    }
+    const headers = [
+      'Order Number',
+      'Customer Name',
+      'Customer Email',
+      'Line Items',
+      'Total (INR)',
+      'Status',
+      'Date'
+    ];
+    const rows = data.data.map((order) => [
+      order.orderNumber,
+      order.customer
+        ? `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim()
+        : 'Guest',
+      order.customer?.email || 'N/A',
+      order.items?.length ?? 0,
+      (order.totalAmountMinor / 100).toFixed(2),
+      order.status,
+      formatDate(order.createdAt)
+    ]);
+    downloadCsvFile(`orders_report_${Date.now()}`, headers, rows);
+    toast.success('Orders CSV report exported!');
+  };
+
+  const handlePrint = () => {
+    triggerPrintView('MerchantPilot AI — Order Operations Ledger');
+  };
 
   // Fetch Orders Query
   const { data, isLoading, isError, refetch } = useQuery({
@@ -180,9 +217,14 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 printable-area">
+      <PrintHeader
+        title="ORDER OPERATIONS & TRANSACTIONS LEDGER"
+        subtitle="Atomic transactional checkout processing, status state machines, and fulfillment tracking"
+      />
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Order Operations</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -191,9 +233,26 @@ export default function OrdersPage() {
           </p>
         </div>
 
-        <Button onClick={() => setCreateOrderOpen(true)} size="sm" className="shadow-xs">
-          <Plus className="mr-1.5 h-4 w-4" /> Create Order
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1.5 h-9 text-xs">
+            <Printer className="h-3.5 w-3.5" /> Print Ledger
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 h-9 text-xs"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </Button>
+          <Button
+            onClick={() => setCreateOrderOpen(true)}
+            size="sm"
+            className="shadow-xs gap-1.5 text-xs h-9"
+          >
+            <Plus className="h-4 w-4" /> Create Order
+          </Button>
+        </div>
       </div>
 
       {/* Unified Payment & Fraud Intelligence Card */}

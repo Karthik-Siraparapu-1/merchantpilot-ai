@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimatedCounter } from '@/hooks/use-animated-counter';
+import { toast } from 'sonner';
 
 // ─── Mock Customer Data (derived from order patterns) ────────────────────
 
@@ -191,6 +192,10 @@ const SEGMENT_CONFIG = {
   }
 };
 
+import { downloadCsvFile, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
+import { Download, Printer } from 'lucide-react';
+
 export default function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSegment, setActiveSegment] = useState<Customer['segment'] | 'ALL'>('ALL');
@@ -215,10 +220,42 @@ export default function CustomersPage() {
     return matchesSearch && matchesSegment;
   });
 
+  const handleExportCsv = () => {
+    const headers = [
+      'Customer Name',
+      'Email',
+      'Segment',
+      'Lifetime Value (INR)',
+      'Total Orders',
+      'Last Order',
+      'RFM Score'
+    ];
+    const rows = filtered.map((c) => [
+      c.name,
+      c.email,
+      c.segment,
+      (c.lifetimeValue / 100).toFixed(2),
+      c.totalOrders,
+      `${c.lastOrderDays}d ago`,
+      Math.round((c.rfmScore.recency + c.rfmScore.frequency + c.rfmScore.monetary) / 3)
+    ]);
+    downloadCsvFile(`customer_roster_${Date.now()}`, headers, rows);
+    toast.success('Customer roster CSV exported!');
+  };
+
+  const handlePrint = () => {
+    triggerPrintView('MerchantPilot AI — Customer Intelligence Roster');
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 printable-area">
+      <PrintHeader
+        title="CUSTOMER INTELLIGENCE & SEGMENTATION ROSTER"
+        subtitle="CLV estimation, RFM analysis, churn prediction, and AI-driven engagement"
+      />
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="secondary" className="gap-1 text-xs">
@@ -237,6 +274,15 @@ export default function CustomersPage() {
             CLV estimation, RFM analysis, churn prediction, and AI-driven engagement
             recommendations.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1.5 h-9 text-xs">
+            <Printer className="h-3.5 w-3.5" /> Print Roster
+          </Button>
+          <Button size="sm" onClick={handleExportCsv} className="gap-1.5 h-9 text-xs shadow-xs">
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </Button>
         </div>
       </div>
 

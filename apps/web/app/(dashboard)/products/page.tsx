@@ -81,6 +81,10 @@ const createProductSchema = z.object({
 
 type CreateProductFormData = z.infer<typeof createProductSchema>;
 
+import { downloadCsvFile, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
+import { Download, Printer } from 'lucide-react';
+
 export default function ProductsPage() {
   const { activeTenantId } = useAuth();
   const queryClient = useQueryClient();
@@ -99,6 +103,37 @@ export default function ProductsPage() {
   // AI Dynamic Pricing & Explainability
   const [explainDrawerOpen, setExplainDrawerOpen] = useState(false);
   const [selectedExplainProduct, setSelectedExplainProduct] = useState<Product | null>(null);
+
+  const handleExportCsv = () => {
+    if (!data?.data || data.data.length === 0) {
+      toast.error('No products to export.');
+      return;
+    }
+    const headers = [
+      'SKU',
+      'Title',
+      'Category',
+      'Price (INR)',
+      'Stock Level',
+      'Status',
+      'Created Date'
+    ];
+    const rows = data.data.map((p) => [
+      p.sku,
+      p.title,
+      p.category?.name || 'General',
+      (p.priceMinor / 100).toFixed(2),
+      p.inventory?.availableQuantity ?? 0,
+      p.status,
+      formatDate(p.createdAt)
+    ]);
+    downloadCsvFile(`catalog_products_${Date.now()}`, headers, rows);
+    toast.success('Catalog products CSV exported!');
+  };
+
+  const handlePrint = () => {
+    triggerPrintView('MerchantPilot AI — Product Catalog Report');
+  };
 
   // Fetch Products Query
   const { data, isLoading, isError, refetch } = useQuery({
@@ -210,9 +245,14 @@ export default function ProductsPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 printable-area">
+      <PrintHeader
+        title="MERCHANT CATALOG PRODUCTS REPORT"
+        subtitle="SKU specifications, pricing tiers, and real-time inventory linkage"
+      />
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Catalog Products</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -220,9 +260,26 @@ export default function ProductsPage() {
           </p>
         </div>
 
-        <Button onClick={() => setCreateDrawerOpen(true)} size="sm" className="shadow-xs">
-          <Plus className="mr-1.5 h-4 w-4" /> Add Product
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1.5 h-9 text-xs">
+            <Printer className="h-3.5 w-3.5" /> Print Catalog
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 h-9 text-xs"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </Button>
+          <Button
+            onClick={() => setCreateDrawerOpen(true)}
+            size="sm"
+            className="shadow-xs gap-1.5 text-xs h-9"
+          >
+            <Plus className="h-4 w-4" /> Add Product
+          </Button>
+        </div>
       </div>
 
       {/* AI Dynamic Pricing Engine Banner */}

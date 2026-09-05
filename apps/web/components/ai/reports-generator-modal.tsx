@@ -14,6 +14,8 @@ import { Download, Sparkles, Printer, CheckCircle2 } from 'lucide-react';
 import { reportsEngine, type ExecutiveReport } from '@/lib/ai/reports-engine';
 import { toast } from 'sonner';
 
+import { downloadRawCsvString, triggerPrintView } from '@/lib/export-utils';
+
 interface ReportsGeneratorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,18 +39,12 @@ export function ReportsGeneratorModal({ open, onOpenChange }: ReportsGeneratorMo
   };
 
   const handleDownloadCsv = () => {
-    const encodedUri = encodeURI(activeReport.csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${activeReport.id}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadRawCsvString(`${activeReport.id}.csv`, activeReport.csvContent);
     toast.success('Executive report CSV downloaded!');
   };
 
   const handlePrint = () => {
-    window.print();
+    triggerPrintView(activeReport.title);
   };
 
   return (

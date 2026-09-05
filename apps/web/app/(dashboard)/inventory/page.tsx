@@ -12,7 +12,9 @@ import {
   TrendingUp,
   RotateCcw,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Printer,
+  Download
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -51,6 +53,8 @@ import {
   SheetDescription
 } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { downloadCsvFile, triggerPrintView } from '@/lib/export-utils';
+import { PrintHeader } from '@/components/layout/print-header';
 
 export default function InventoryPage() {
   const { activeTenantId } = useAuth();
@@ -73,6 +77,39 @@ export default function InventoryPage() {
   // AI Forecasting & Explainability State
   const [explainDrawerOpen, setExplainDrawerOpen] = useState(false);
   const [selectedExplainItem, setSelectedExplainItem] = useState<InventoryItem | null>(null);
+
+  const handleExportCsv = () => {
+    if (!data?.data || data.data.length === 0) {
+      toast.error('No inventory items to export.');
+      return;
+    }
+    const headers = [
+      'SKU',
+      'Product Title',
+      'Available Stock',
+      'Reserved Stock',
+      'Reorder Threshold',
+      'Status'
+    ];
+    const rows = data.data.map((item) => [
+      item.product?.sku || 'N/A',
+      item.product?.title || 'Catalog Product',
+      item.availableQuantity,
+      item.reservedQuantity,
+      item.reorderThreshold,
+      item.availableQuantity === 0
+        ? 'OUT_OF_STOCK'
+        : item.availableQuantity <= item.reorderThreshold
+          ? 'LOW_STOCK'
+          : 'HEALTHY'
+    ]);
+    downloadCsvFile(`inventory_telemetry_${Date.now()}`, headers, rows);
+    toast.success('Inventory telemetry CSV exported!');
+  };
+
+  const handlePrint = () => {
+    triggerPrintView('MerchantPilot AI — Inventory & Warehouse Telemetry');
+  };
 
   // Fetch Inventory Query
   const { data, isLoading, isError, refetch } = useQuery({
@@ -142,9 +179,14 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 printable-area">
+      <PrintHeader
+        title="INVENTORY & WAREHOUSE TELEMETRY REPORT"
+        subtitle="Real-time multi-location stock audit, replenishment thresholds, and reservation tracking"
+      />
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 no-print">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Inventory & Warehouse Telemetry
@@ -153,6 +195,15 @@ export default function InventoryPage() {
             Real-time multi-location stock replenishment, reservation tracking, and immutable audit
             trails
           </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1.5 h-9 text-xs">
+            <Printer className="h-3.5 w-3.5" /> Print Telemetry
+          </Button>
+          <Button size="sm" onClick={handleExportCsv} className="gap-1.5 h-9 text-xs shadow-xs">
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </Button>
         </div>
       </div>
 

@@ -125,3 +125,108 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.4);
 }
+
+/* ==========================================
+   Executive PDF / Print Media Styles
+   ========================================== */
+@media print {
+  /* Page Setup */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  /* Reset layout and force crisp light-mode background */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide UI chrome, navigation, headers, sidebars, floating widgets, buttons */
+  header,
+  nav,
+  aside,
+  [data-sidebar],
+  .no-print,
+  button,
+  .btn,
+  #voice-copilot-trigger,
+  [role="dialog"] header button,
+  [data-sonner-toaster],
+  .lucide-sparkles-floating {
+    display: none !important;
+  }
+
+  /* Expand main container full-width */
+  main, .printable-area, .space-y-6 {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Ensure cards look pristine in print */
+  .card, div[class*="Card"] {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    margin-bottom: 12pt !important;
+  }
+
+  /* Tables formatting for print */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th, td {
+    border: 1px solid #e2e8f0 !important;
+    padding: 6pt 8pt !important;
+    color: #0f172a !important;
+    font-size: 9.5pt !important;
+  }
+
+  th {
+    background-color: #f8fafc !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Badges in print */
+  [class*="Badge"] {
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    background: #f1f5f9 !important;
+  }
+
+  /* Print Header Watermark */
+  .print-only-header {
+    display: block !important;
+    border-bottom: 2px solid #3b82f6 !important;
+    padding-bottom: 10pt !important;
+    margin-bottom: 15pt !important;
+  }
+}
+
+/* Default hidden for print-only header in screen view */
+.print-only-header {
+  display: none;
+}
+
