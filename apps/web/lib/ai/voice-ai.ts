@@ -5,6 +5,8 @@
  * dynamic audio wave simulation, and memory reinforcement.
  */
 
+import { toast } from 'sonner';
+
 interface SpeechRecognitionErrorEvent extends Event {
   error: string;
 }
@@ -148,6 +150,11 @@ export class VoiceAIEngine {
           };
 
           this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+            if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') {
+              toast.error(
+                'Microphone permission required. Click the orb to grant access or type your command below.'
+              );
+            }
             // Non-fatal background speech errors like 'no-speech' or 'aborted'
             if (event?.error === 'no-speech' || event?.error === 'aborted') {
               if (

@@ -247,9 +247,7 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
       commandHandlerRef.current(cmd);
     });
 
-    if (open) {
-      voiceAI.startListening();
-    } else {
+    if (!open) {
       voiceAI.stopSpeaking();
       voiceAI.stopListening();
     }
