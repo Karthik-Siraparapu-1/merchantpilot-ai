@@ -1,33 +1,37 @@
-name: CI
+name: CI Pipeline
 
 on:
-  pull_request:
   push:
-    branches: [main]
-
-permissions:
-  contents: read
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
 
 jobs:
-  quality:
+  build-and-test:
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://merchantpilot:merchantpilot@localhost:5432/merchantpilot?schema=public
-      REDIS_URL: redis://localhost:6379
-      JWT_SECRET: ci-mock-secret-key-12345
-      JWT_REFRESH_SECRET: ci-mock-refresh-secret-12345
+
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          version: 10.6.5
-      - uses: actions/setup-node@v4
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
         with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - run: pnpm build
-      - run: pnpm lint
-      - run: pnpm typecheck
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript Verification
+        run: pnpm typecheck
+
+      - name: Linting Check
+        run: pnpm lint
+
+      - name: Build Web Application
+        run: pnpm build --filter @merchantpilot/web

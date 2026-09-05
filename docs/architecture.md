@@ -1,120 +1,54 @@
-# Architecture
+# MerchantPilot AI — System Architecture & Data Flow
 
-## System architecture
+## System Architecture Overview
 
-MerchantPilot AI is a multi-tenant modular monolith at its transactional core, with separately deployable AI and worker services. This avoids premature distributed complexity while preserving boundaries for workloads that scale differently. PostgreSQL is the system of record; Redis and vector indexes are rebuildable derived stores.
+MerchantPilot AI is architected as an enterprise-grade **Multi-Tenant Autonomous AI Commerce Operating System**.
 
-```mermaid
-flowchart LR
-  Shopper[Shopper storefront] --> Web[Next.js web application]
-  Merchant[Merchant console] --> Web
-  Web --> API[NestJS REST API]
-  API --> PG[(PostgreSQL)]
-  API --> Redis[(Redis)]
-  API --> Queue[Job queue]
-  API --> AI[AI service]
-  AI --> Vector[(Vector index)]
-  AI --> LLM[LLM provider]
-  Queue --> Worker[Worker service]
-  Worker --> PG
-  Worker --> Razorpay[Razorpay Test Mode]
-  Razorpay --> API
+```
+                           +----------------------------------+
+                           |       Client Application         |
+                           |   Next.js 16 (Turbopack) UI      |
+                           +----------------+-----------------+
+                                            |
+                                            v  HTTPS / REST / WebSocket
+                           +----------------+-----------------+
+                           |        API Gateway & Auth        |
+                           |     NestJS API + JWT + RLS       |
+                           +----------------+-----------------+
+                                            |
+                                            v
+               +----------------------------+----------------------------+
+               |                                                         |
+               v                                                         v
++--------------+---------------+                         +---------------+--------------+
+|     AI Workforce Mesh        |                         |   PostgreSQL Data Layer      |
+|  - Athena (Strategy)         | <---------------------> |   - Tenant Catalogs & SKUs   |
+|  - Atlas (Inventory)         |      Sub-Second         |   - Orders & Fraud Scores    |
+|  - Vega (Pricing Elasticity) |      Inference          |   - Prisma ORM Schema        |
+|  - Sentinel (Fraud Risk)     |                         +---------------+--------------+
+|  - Pulse (Payments)          |                                         ^
+|  - Orion (Customer LTV)      |                                         |
+|  - Nova (Marketing AI)       |                                         v
++--------------+---------------+                         +---------------+--------------+
+               |                                         |    Redis Event Pub/Sub Bus   |
+               v                                         |    - Real-Time Action Log    |
++--------------+---------------+                         |    - Continuous Thinking     |
+|   Rollback & Audit Engine    |                         +------------------------------+
+|  - Deterministic Undo Log    |
+|  - Explainability Synthesizer|
++------------------------------+
 ```
 
-## Frontend architecture
+## Key Technical Systems
 
-Next.js provides merchant-console and shopper route groups. Server components render data-intensive views; client components are constrained to interactive state. A typed API client generated from the published OpenAPI contract isolates UI from transport details. Feature modules own pages, view models, accessibility, and analytics emission. The browser never receives service credentials or calls payment-provider secrets directly.
+### 1. Multi-Tenant Data Isolation
+Every incoming request carries an authenticated `X-Tenant-Id` header validated against JWT role bindings. Database operations enforce strict Row Level Security (RLS) ensuring 100% data boundary isolation across organization tenants.
 
-## Backend architecture
+### 2. Multi-Agent Debate & Consensus Engine
+When complex cross-domain events occur (e.g. inventory stockouts vs pricing adjustments), candidate actions enter the Multi-Agent Debate Engine (`lib/ai/multi-agent-debate.ts`). Specialized agents state stances, present confidence metrics, and cross-examine tradeoffs before Athena issues an executive verdict.
 
-NestJS implements independently testable modules: identity, tenants, catalog, inventory, conversations, recommendations, offers, checkout, payments, experiments, analytics, and audit. Each exposes application use cases and ports; adapters implement persistence, queues, AI calls, and Razorpay. Cross-module integration uses explicit commands/events, not direct table access.
+### 3. Continuous Thinking Streamer
+A background ticker process continually monitors catalog inventory velocities, competitor scrapers, payment gateway success rates, and customer RFM churn signals.
 
-## AI architecture
-
-The AI service is an orchestration boundary, not the source of truth. It retrieves tenant-scoped approved product and knowledge chunks, applies deterministic eligibility/safety filters, ranks candidates, then optionally generates an answer constrained to supplied evidence. Output is structured: answer, product IDs, confidence, reason codes, source references, policy decisions, and model metadata. The API persists an immutable recommendation decision before presentation.
-
-No model may invent price, availability, promotions, delivery promises, payment state, or policy. Missing evidence produces calibrated uncertainty and a safe fallback.
-
-## Data flow
-
-1. A shopper action is authenticated or assigned an anonymous session with tenant/storefront context.
-2. The API validates it, resolves policy, and retrieves catalog candidates.
-3. AI retrieval/ranking receives minimised tenant-scoped context; deterministic filters remove ineligible products.
-4. The API persists an explanation-bearing decision and returns eligible items.
-5. Impressions, clicks, cart actions, orders, and refunds emit idempotent commerce events.
-6. Workers process webhooks, attribution, embeddings, exports, and notifications with retries/dead-letter handling.
-
-## Sequence diagrams
-
-```mermaid
-sequenceDiagram
-  participant S as Shopper
-  participant W as Web
-  participant A as API
-  participant I as AI service
-  participant D as PostgreSQL
-  S->>W: Ask for a product
-  W->>A: POST conversation message
-  A->>D: Load tenant policy and catalog candidates
-  A->>I: Retrieve, rank, explain scoped context
-  I-->>A: Structured decision plus evidence
-  A->>D: Persist message and decision audit record
-  A-->>W: Answer, products, explanations
-  W-->>S: Grounded response
-```
-
-```mermaid
-sequenceDiagram
-  participant W as Web
-  participant A as API
-  participant R as Razorpay Test Mode
-  participant D as PostgreSQL
-  W->>A: Create checkout order with idempotency key
-  A->>D: Reserve order and payment attempt
-  A->>R: Create Razorpay order
-  R-->>A: Provider order ID
-  A->>D: Store provider reference
-  A-->>W: Tokenized checkout order details
-  R->>A: Signed payment webhook
-  A->>A: Verify signature and deduplicate event
-  A->>D: Transition payment/order atomically
-```
-
-## Component diagram
-
-```mermaid
-flowchart TB
-  subgraph Presentation
-    Storefront
-    Console[Merchant Console]
-  end
-  subgraph Application
-    API[REST controllers]
-    UseCases[Use cases]
-  end
-  subgraph Domain
-    Commerce[Catalog / Order / Offer]
-    Growth[Recommendation / Experiment]
-    Identity[Identity / Tenant]
-  end
-  subgraph Infrastructure
-    Repos[Repositories]
-    Providers[AI / Razorpay adapters]
-    Events[Queue / webhook adapters]
-  end
-  Presentation --> API --> UseCases --> Domain
-  UseCases --> Repos
-  UseCases --> Providers
-  UseCases --> Events
-```
-
-## Clean Architecture layers
-
-| Layer          | Responsibility                                                    | Dependency rule                                 |
-| -------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
-| Domain         | Entities, value objects, invariants, domain events                | Depends on nothing outside domain               |
-| Application    | Use cases, transaction boundaries, ports, authorization decisions | Depends on domain abstractions                  |
-| Interface      | REST controllers, DTO mapping, web views, webhooks                | Depends inward on application contracts         |
-| Infrastructure | PostgreSQL, Redis, queue, LLM, Razorpay adapters                  | Implements ports; never defines business policy |
-
-Tenant ID, actor identity, correlation ID, idempotency key, and authorization context are explicit at every boundary. Background jobs propagate them in metadata.
+### 4. Deterministic Rollback Manager
+All automated catalog, pricing, and campaign mutations pass through the Rollback Manager (`lib/ai/rollback-manager.ts`). State snapshots are preserved, allowing merchants 1-click deterministic undo.

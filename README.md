@@ -1,250 +1,158 @@
+<div align="center">
+
 # MerchantPilot AI
 
-> **Explainable AI Commerce Platform for Modern Retail & Indian D2C Merchants**
-> Turning browsing and purchase intent into high-converting, measurable revenue opportunities through conversational shopping, explainable recommendations, transactional order orchestration, and robust multi-tenant guardrails.
+### The AI Commerce Operating System
+
+**Autonomous digital employees that analyze, reason, forecast, protect, and execute commerce operations.**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-555?logo=prisma)](https://www.prisma.io/)
+[![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
 ---
 
-## 📑 Table of Contents
+</div>
 
-- [Overview](#overview)
-- [System Architecture](#system-architecture)
-- [Core Modules & Capabilities](#core-modules--capabilities)
-- [Security & Multi-Tenant Isolation](#security--multi-tenant-isolation)
-- [API Reference & Swagger](#api-reference--swagger)
-- [Tech Stack](#tech-stack)
-- [Monorepo Structure](#monorepo-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation & Environment Setup](#installation--environment-setup)
-  - [Database Migration & Seeding](#database-migration--seeding)
-  - [Running the Services](#running-the-services)
-- [Verification & Quality Gates](#verification--quality-gates)
-- [Roadmap & Next Steps](#roadmap--next-steps)
+## Overview
+
+MerchantPilot AI replaces static administrative e-commerce dashboards with an **autonomous team of 7 specialized digital executives**. Instead of human managers checking 10 separate tools every morning, MerchantPilot continuously monitors stock velocity, scrapes competitor pricing, intercepts ingress fraud, optimizes payment gateway routing, and executes personalized customer campaigns.
 
 ---
 
-## 🌟 Overview
+## Technical Architecture
 
-Merchants typically sit on vast product catalogs and transaction histories without a trustworthy, automated layer that connects customer intent to higher basket values.
-
-**MerchantPilot AI** bridges this gap:
-
-1. **Explainable AI Decisions**: Every recommendation comes with human-readable rationale and merchant policy auditability.
-2. **Transactional Integrity**: Atomic order placement with automatic stock reservation, deduction, and automated replenishment on cancellations.
-3. **Multi-Tenant Security**: Strict tenant isolation across merchants, stores, roles, and resources.
-4. **Actionable Analytics**: Real-time revenue metrics, order velocity, inventory health, and top-selling product insights.
-
----
-
-## 🏛️ System Architecture
-
-```mermaid
-flowchart TB
-    subgraph ClientLayer["Frontend & Client Layer"]
-        WebConsole["Next.js Merchant Console<br/>(Admin & Analytics)"]
-        Storefront["Shopper Storefront<br/>(Conversational UI)"]
-    end
-
-    subgraph APILayer["NestJS Modular Monolith (:3001)"]
-        Gateway["Global Auth & Tenant Interceptors<br/>(JWT + RolesGuard + TenantGuard)"]
-
-        subgraph CoreModules["Core Domain Modules"]
-            AuthMod["Auth & RBAC Module"]
-            ProductMod["Product Management"]
-            InventoryMod["Inventory & Stock Adjustments"]
-            OrderMod["Orders (Prisma $transaction)"]
-            DashboardMod["Dashboard Analytics"]
-        end
-
-        Gateway --> AuthMod
-        Gateway --> ProductMod
-        Gateway --> InventoryMod
-        Gateway --> OrderMod
-        Gateway --> DashboardMod
-    end
-
-    subgraph DataLayer["Persistence & Infrastructure"]
-        PostgreSQL[("PostgreSQL Database<br/>(Authoritative Ledger)")]
-        RedisCache[("Redis<br/>(Rate Limiting & Caching)")]
-        AuditStore[("Audit Logs & Event Ledger")]
-    end
-
-    WebConsole -->|REST / OpenAPI| Gateway
-    Storefront -->|REST / OpenAPI| Gateway
-
-    ProductMod --> PostgreSQL
-    InventoryMod --> PostgreSQL
-    OrderMod -->|Atomic Transaction| PostgreSQL
-    OrderMod --> AuditStore
-    DashboardMod --> PostgreSQL
+```
+                               +-----------------------------------+
+                               |     Next.js 16 Web Frontend       |
+                               | (TailwindCSS, Framer Motion, App) |
+                               +-----------------+-----------------+
+                                                 |
+                                                 v
+                               +-----------------+-----------------+
+                               |    NestJS Backend API Gateway     |
+                               | (JWT Auth, Multi-Tenant RLS)      |
+                               +-----------------+-----------------+
+                                                 |
+                                                 v
+                   +-----------------------------+-----------------------------+
+                   |                                                           |
+                   v                                                           v
++------------------+------------------+                     +------------------+------------------+
+|       AI Digital Workforce Mesh     |                     |    PostgreSQL + Prisma Data Layer     |
+| - Athena   (Strategy & Chief of Staff)| <-----------------> | - Multi-Tenant Tenant Isolation  |
+| - Atlas    (Inventory Velocity & PO)|    Sub-Second       | - Active Catalog & Orders Schema |
+| - Vega     (Dynamic Elasticity)     |    Inference        +------------------+------------------+
+| - Sentinel (Ingress Fraud Risk)     |                                        ^
+| - Pulse    (Checkout Payments)      |                                        |
+| - Orion    (Customer Churn & LTV)   |                                        v
+| - Nova     (Marketing Campaigns)    |                     +------------------+------------------+
++------------------+------------------+                     |     Redis Pub/Sub Event Bus      |
+                   |                                        | - Live Reasoning & Activity Log  |
+                   v                                        +----------------------------------+
++------------------+------------------+
+|   Deterministic Rollback Engine     |
+| - 1-Click Undo Mutation Log         |
++-------------------------------------+
 ```
 
 ---
 
-## 📦 Core Modules & Capabilities
+## 🤖 The Digital Executive Team
 
-| Module          | Endpoints                                                                                                                                                  | Key Capabilities                                                                                                                                                                                                                     |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Auth & RBAC** | `POST /auth/register`<br/>`POST /auth/login`<br/>`POST /auth/refresh`<br/>`GET /auth/me`                                                                   | Argon2 hashing, dual JWT tokens (Access + Refresh rotation), Role hierarchy (`MERCHANT_OWNER`, `MERCHANDISER`, `SUPPORT_AGENT`, `PLATFORM_OPERATOR`).                                                                                |
-| **Products**    | `POST /products`<br/>`GET /products`<br/>`GET /products/:id`<br/>`PATCH /products/:id`<br/>`DELETE /products/:id`                                          | Multi-tenant catalog CRUD, SKU uniqueness validation per store, Category relations, status lifecycle (`DRAFT`, `ACTIVE`, `OUT_OF_STOCK`, `ARCHIVED`), pagination & keyword search.                                                   |
-| **Inventory**   | `GET /inventory`<br/>`GET /inventory/low-stock`<br/>`GET /inventory/:productId`<br/>`PATCH /inventory/:productId/adjust`<br/>`PATCH /inventory/:productId` | Atomic delta/absolute adjustments, reorder threshold alerts, automatic stock exhaustion detection, audit logging of quantity shifts.                                                                                                 |
-| **Orders**      | `POST /orders`<br/>`GET /orders`<br/>`GET /orders/:id`<br/>`PATCH /orders/:id/status`                                                                      | **`prisma.$transaction`** orchestration: validates catalog & store, ensures stock availability, atomically decrements stock, updates product status on depletion, records audit log, and handles inventory rollback on cancellation. |
-| **Dashboard**   | `GET /dashboard`                                                                                                                                           | High-level merchant metrics: Today's & Total Revenue, Order counts, Catalog size, Low-stock alerts, Top-selling products by quantity, and Recent order activity.                                                                     |
-
----
-
-## 🔒 Security & Multi-Tenant Isolation
-
-MerchantPilot AI implements strict multi-tenancy at the gateway and repository levels:
-
-1. **Authentication Guard (`JwtAuthGuard`)**: Validates the JWT bearer token, extracts user ID, merchant ID, store ID, and assigned roles.
-2. **Tenant Guard (`TenantGuard`)**: Ensures the requested store or merchant belongs strictly to the authenticated context. Prevents cross-tenant data leakage.
-3. **Roles Guard (`RolesGuard`)**: Enforces granular permissions on write endpoints (e.g. `MERCHANT_OWNER` or `MERCHANDISER` required for catalog modifications; `SUPPORT_AGENT` has read-only access).
+| Agent | Name | Role & Specialization | Key Metrics Handled |
+| --- | --- | --- | --- |
+| 👑 | **Athena** | Chief of Staff & Strategy | Business Health Score (95/100), Executive Verdicts |
+| 📦 | **Atlas** | Inventory & PO Specialist | Safety Stock, Out-of-Stock Reduction, Lead Times |
+| 🏷️ | **Vega** | Dynamic Pricing & Elasticity | Monte Carlo Curves, Gross Margin Lift % |
+| 🛡️ | **Sentinel** | Fraud & Security Sentinel | IP/VPN Ingress Scoring, Fraud Holds |
+| ⚡ | **Pulse** | Checkout Payment Intelligence | Gateway Routing (Razorpay/Cashfree/PayU SLA) |
+| 🎯 | **Orion** | Customer Retention & LTV | RFM Matrix, Churn Mitigation Offers |
+| 🚀 | **Nova** | Marketing & Campaign AI | WhatsApp VIP Blasts, Promotional Coupons |
 
 ---
 
-## 📖 API Reference & Swagger
+## Key Features
 
-Interactive Swagger/OpenAPI documentation is automatically generated and accessible when running the API:
+### 1. Autonomous Executive Command Center
+- Daily briefing greeting ("Good Afternoon Karthik"), Business Health Score (95/100), and ₹82,000 uncaptured profit opportunity cards.
 
-- **Swagger UI**: [http://localhost:3001/api/docs](http://localhost:3001/api/docs)
-- **OpenAPI JSON**: [http://localhost:3001/api/docs-json](http://localhost:3001/api/docs-json)
+### 2. Multi-Agent Debate & Consensus Engine
+- Agents cross-examine business tradeoffs live (Atlas vs Vega vs Pulse) before Athena issues an executive verdict.
 
----
+### 3. Business Digital Twin & Scenario Lab
+- Monte Carlo price elasticity simulations modeling revenue, order volume, margin, and risk across custom growth scenarios.
 
-## 💻 Tech Stack
+### 4. Hands-Free Voice AI Assistant (`⌘.`)
+- Web Speech API integration with wake-phrase detection, interruption ("Stop"), and multi-turn context memory.
 
-- **Monorepo Engine:** [Turborepo](https://turbo.build/) + [pnpm](https://pnpm.io/)
-- **Backend API:** [NestJS](https://nestjs.com/) (Node.js / TypeScript)
-- **Database & ORM:** [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
-- **Validation & Serialization:** `class-validator`, `class-transformer`
-- **Security:** `@nestjs/jwt`, `argon2`, `passport-jwt`
-- **Testing:** [Vitest](https://vitest.dev/)
-- **Code Quality:** ESLint, Prettier, Husky, lint-staged
+### 5. AI AutoPilot Governance Center
+- Per-domain guardrail controls (`Manual`, `Semi-Auto (1-Click Approval)`, `Fully Autonomous`).
 
----
-
-## 📂 Monorepo Structure
-
-```text
-merchantpilot-ai/
-├── apps/
-│   ├── api/                     # NestJS modular backend service
-│   │   └── src/
-│   │       ├── auth/            # JWT authentication, hashing, guards
-│   │       ├── products/        # Product catalog & CRUD management
-│   │       ├── inventory/       # Stock tracking & low-stock alerts
-│   │       ├── orders/          # Transactional order engine
-│   │       ├── dashboard/       # Merchant analytics & KPI aggregation
-│   │       └── common/          # Global filters, decorators, interceptors
-│   ├── web/                     # Next.js frontend console (Merchant portal)
-│   ├── ai-service/              # FastAPI retrieval & explanation service
-│   └── worker/                  # Asynchronous task processor & webhooks
-├── packages/
-│   ├── database/                # Prisma schema, migrations, seed script, client
-│   ├── contracts/               # Shared DTOs and API interface contracts
-│   ├── config/                  # Shared environment and config parsers
-│   └── observability/           # Logging & tracing utilities
-├── docs/                        # Architecture & design specifications
-└── README.md
-```
+### 6. AI Trust & Transparency Center
+- Real-time decision accuracy (98.4%), sub-second decision latency (420ms), SOC2 compliance badges, and 1-click deterministic rollback.
 
 ---
 
-## 🚀 Getting Started
+## Quick Start & Local Setup
 
 ### Prerequisites
+- Node.js 20+
+- pnpm 9+
+- PostgreSQL 16 & Redis (or Docker)
 
-- **Node.js**: `v22.x` or later
-- **pnpm**: `v10.x` or later (`corepack enable pnpm`)
-- **Docker** & **Docker Compose** (for PostgreSQL)
-
-### Installation & Environment Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/Karthik-Siraparapu-1/merchantpilot-ai.git
-   cd merchantpilot-ai
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   ```
-
-### Database Migration & Seeding
-
-1. **Start the PostgreSQL database:**
-
-   ```bash
-   docker compose up -d postgres
-   ```
-
-2. **Generate Prisma Client & Run Migrations:**
-
-   ```bash
-   pnpm --filter @merchantpilot/database db:generate
-   pnpm --filter @merchantpilot/database db:migrate
-   ```
-
-3. **Seed rich sample data (20 products, categories, inventories, realistic orders):**
-   ```bash
-   pnpm --filter @merchantpilot/database db:seed
-   ```
-
-### Running the Services
-
-Start the development server with Turbo:
-
+### Installation Commands
 ```bash
+# 1. Clone the repository
+git clone https://github.com/merchantpilot/merchantpilot-ai.git
+cd merchantpilot-ai
+
+# 2. Install workspace dependencies
+pnpm install
+
+# 3. Environment configuration
+cp .env.example .env
+
+# 4. Run database migrations
+pnpm prisma migrate dev
+
+# 5. Launch development servers
 pnpm dev
 ```
 
-Or run the NestJS API specifically:
-
-```bash
-pnpm --filter @merchantpilot/api dev
-```
-
-API will be live at `http://localhost:3001` with Swagger docs at `http://localhost:3001/api/docs`.
+The web dashboard will be accessible at `http://localhost:3000` and the API gateway at `http://localhost:3001`.
 
 ---
 
-## 🧪 Verification & Quality Gates
+## Project Sitemap (26 Production Routes)
 
-The project maintains 100% test passing and strict code quality:
-
-```bash
-# Run all unit and controller tests
-pnpm --filter @merchantpilot/api test
-
-# Run typechecking
-pnpm --filter @merchantpilot/api typecheck
-
-# Run lint checks
-pnpm --filter @merchantpilot/api lint
-
-# Build production bundle
-pnpm --filter @merchantpilot/api build
-```
+- `/dashboard` — AI Command Center & Executive Cockpit
+- `/ai-workforce` — Digital Employee Grid, Org Chart, Goals & Task Pipeline
+- `/trust` — AI Trust & Transparency Center
+- `/autopilot` — Domain Autonomy & Human-in-the-Loop Governance Matrix
+- `/marketplace` — Modular AI Agent & Plugin Store
+- `/system` — Real-Time Microservice Diagnostics & SOC2 Compliance
+- `/copilot` — Conversational Business Copilot with Context Memory & Streaming
+- `/scenario-lab` — Business Digital Twin Sandbox Simulator
+- `/predictions` — Predictive Demand & Dynamic Pricing Elasticity
+- `/marketing` — Autonomous Campaign Generator & VIP WhatsApp Blast
+- `/audit-log` — Immutable AI Action Log & Rollback Manager
+- `/reports` — Executive PDF & CSV Report Generator
+- `/landing` — High-Impact Live Interactive Demo Landing Page
 
 ---
 
-## 🗺️ Roadmap & Next Steps
+## 🔮 Future Roadmap
 
-- [x] Multi-tenant Authentication & Role-Based Access Control
-- [x] Product Management with Category & SKU integrity
-- [x] Inventory Management with low-stock detection & atomic adjustments
-- [x] Transactional Orders Engine with automatic stock deduction & audit trails
-- [x] Merchant Dashboard Analytics (`/dashboard`)
-- [x] Database Seeder with 20 rich catalog products & sample orders
-- [ ] Razorpay Test Mode Payment Gateway Webhook integration
-- [ ] AI-Powered Explainable Recommendation & Upsell microservice integration
+- [ ] **Mobile Native Companion App** (iOS / Android React Native)
+- [ ] **Model Context Protocol (MCP)** integration for custom ERP connections
+- [ ] **Autonomous Procurement Engine** with direct supplier API dispatch
+- [ ] **LangGraph Multi-Agent Mesh** integration for complex multi-turn workflows
+
+---
+
+## 📄 License & Security
+
+This project is licensed under the [MIT License](LICENSE). For security disclosures, please refer to [SECURITY.md](SECURITY.md).

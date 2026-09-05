@@ -13,7 +13,9 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/generated/**',
       '**/.turbo/**',
-      '**/coverage/**'
+      '**/coverage/**',
+      '**/*.config.mjs',
+      '**/*.config.js'
     ]
   },
   eslint.configs.recommended,
@@ -39,6 +41,14 @@ export default tseslint.config(
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }
+      ],
       'import/no-cycle': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn'
