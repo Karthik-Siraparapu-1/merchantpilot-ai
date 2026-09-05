@@ -153,6 +153,110 @@ export const copilotEngine = {
     const id = `msg-${Date.now()}`;
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // 0A. REVENUE / SALES DROP ANALYSIS
+    if (
+      q.includes('drop') ||
+      q.includes('fell') ||
+      q.includes('decrease') ||
+      q.includes('why did revenue') ||
+      q.includes('why did sales')
+    ) {
+      return {
+        id,
+        sender: 'COPILOT',
+        text: 'Yesterday revenue fell 8.4% primarily due to stockouts in High-Margin Laptop Stands (SKU-LST-09) during peak 2 PM - 6 PM traffic, causing ₹34,200 in uncaptured orders.',
+        timestamp,
+        intent: 'ANALYTICS',
+        confidenceScore: 96,
+        confidenceLevel: 'HIGH',
+        explainability: {
+          why: 'Correlated hourly cart conversions against active catalog stock levels.',
+          dataSources: ['Inventory Telemetry', 'Hourly Checkout Logs'],
+          reasoningChain: [
+            'Detected 142 unfulfilled checkout attempts between 2 PM and 6 PM.',
+            'Stock runway hit 0 units at 1:48 PM.',
+            'Finance & Inventory Agents recommend auto-restocking 80 units.'
+          ]
+        },
+        dataPayload: {
+          summaryMetrics: [
+            { label: 'Revenue Drop', value: '-8.4%', trend: 'Uncaptured' },
+            { label: 'Unfilled Orders', value: '₹34,200', trend: 'Stockout' }
+          ],
+          actionButton: {
+            label: 'View Inventory Telemetry',
+            actionType: 'NAVIGATE',
+            targetUrl: '/inventory'
+          }
+        }
+      };
+    }
+
+    // 0B. DIWALI / FESTIVE DEMAND SPIKE FORECAST
+    if (q.includes('diwali') || q.includes('spike') || q.includes('festive')) {
+      return {
+        id,
+        sender: 'COPILOT',
+        text: 'Projecting +142% order velocity starting Oct 18th. Expected gross revenue ₹18.4 Lakhs with 89% probability. Critical risk: Wireless Earbuds will run out in 6 days.',
+        timestamp,
+        intent: 'FORECAST',
+        confidenceScore: 93,
+        confidenceLevel: 'HIGH',
+        explainability: {
+          why: 'Trained on 3 years of festive season order velocity and regional demand data.',
+          dataSources: ['Predictive Demand Engine', 'Historical Festival Sales'],
+          reasoningChain: [
+            'Analyzed YoY festive sales acceleration.',
+            'Calculated 6-day stock runway for high-demand audio gear.',
+            'Recommended issuing supplier PO of 250 units before Oct 12.'
+          ]
+        },
+        dataPayload: {
+          summaryMetrics: [
+            { label: 'Projected GMV', value: '₹18.4 Lakhs', trend: '+142%' },
+            { label: 'Probability', value: '89%', trend: 'High' }
+          ],
+          actionButton: {
+            label: 'View Demand Predictions',
+            actionType: 'NAVIGATE',
+            targetUrl: '/predictions'
+          }
+        }
+      };
+    }
+
+    // 0C. BUSINESS DIGITAL TWIN / PRICE SIMULATION
+    if (q.includes('simulate') || q.includes('+8%') || q.includes('price increase')) {
+      return {
+        id,
+        sender: 'COPILOT',
+        text: 'Demand elasticity is -0.32 (inelastic). Increasing prices by +8% results in only -2.1% order dip while net profit margin jumps from 34.2% to 41.8% (+₹68,000/mo).',
+        timestamp,
+        intent: 'ACTION',
+        confidenceScore: 98,
+        confidenceLevel: 'HIGH',
+        explainability: {
+          why: 'Simulated 10,000 synthetic transaction scenarios across elastic demand curves.',
+          dataSources: ['Pricing Elasticity Agent', 'Digital Twin Simulator'],
+          reasoningChain: [
+            'Verified competitor stockout status on top 15 catalog items.',
+            'Net profit lift projected at +₹68,000 per month.'
+          ]
+        },
+        dataPayload: {
+          summaryMetrics: [
+            { label: 'Margin Jump', value: '41.8%', trend: '+7.6%' },
+            { label: 'Monthly Profit Lift', value: '+₹68,000', trend: 'Optimized' }
+          ],
+          actionButton: {
+            label: 'Run Digital Twin Simulator',
+            actionType: 'NAVIGATE',
+            targetUrl: '/scenario-lab'
+          }
+        }
+      };
+    }
+
     // 1. EXPLAIN MY BUSINESS
     if (
       q.includes('explain my business') ||

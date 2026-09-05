@@ -52,9 +52,85 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
       const lower = text.toLowerCase();
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      // 1. Voice Tool Call: Increase Mouse Price
+      // 1. Navigation Commands (Detect "open", "show", "go to", "navigate", "view", or page name)
+      const isNavIntent =
+        lower.includes('open') ||
+        lower.includes('show') ||
+        lower.includes('go to') ||
+        lower.includes('navigate') ||
+        lower.includes('take me') ||
+        lower.includes('view');
+
+      if (isNavIntent) {
+        if (lower.includes('order') || lower.includes('purchase')) {
+          voiceAI.speak('Opening live orders dashboard.');
+          onOpenChange(false);
+          router.push('/orders');
+          return;
+        }
+        if (lower.includes('product') || lower.includes('catalog') || lower.includes('item')) {
+          voiceAI.speak('Navigating to product catalog.');
+          onOpenChange(false);
+          router.push('/products');
+          return;
+        }
+        if (lower.includes('inventory') || lower.includes('warehouse') || lower.includes('stock')) {
+          voiceAI.speak('Opening warehouse inventory telemetry.');
+          onOpenChange(false);
+          router.push('/inventory');
+          return;
+        }
+        if (lower.includes('analytic') || lower.includes('chart') || lower.includes('metric')) {
+          voiceAI.speak('Opening executive analytics dashboard.');
+          onOpenChange(false);
+          router.push('/analytics');
+          return;
+        }
+        if (lower.includes('predict') || lower.includes('forecast')) {
+          voiceAI.speak('Navigating to predictive demand forecasting.');
+          onOpenChange(false);
+          router.push('/predictions');
+          return;
+        }
+        if (lower.includes('workforce') || lower.includes('agent')) {
+          voiceAI.speak('Opening autonomous AI workforce.');
+          onOpenChange(false);
+          router.push('/ai-workforce');
+          return;
+        }
+        if (lower.includes('scenario') || lower.includes('twin') || lower.includes('simulat')) {
+          voiceAI.speak('Opening digital twin scenario lab.');
+          onOpenChange(false);
+          router.push('/scenario-lab');
+          return;
+        }
+        if (lower.includes('marketing') || lower.includes('campaign')) {
+          voiceAI.speak('Opening AI marketing engine.');
+          onOpenChange(false);
+          router.push('/marketing');
+          return;
+        }
+        if (lower.includes('setting') || lower.includes('config')) {
+          voiceAI.speak('Opening system settings.');
+          onOpenChange(false);
+          router.push('/settings');
+          return;
+        }
+        if (
+          lower.includes('dashboard') ||
+          lower.includes('home') ||
+          lower.includes('command center')
+        ) {
+          voiceAI.speak('Opening executive command center.');
+          onOpenChange(false);
+          router.push('/dashboard');
+          return;
+        }
+      }
+
+      // 2. Voice Tool Call: Increase Mouse Price (Action prompt)
       if (
-        lower.includes('price') ||
+        lower.includes('increase price') ||
         lower.includes('increase mouse') ||
         lower.includes('raise price')
       ) {
@@ -96,8 +172,12 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
         return;
       }
 
-      // 2. Voice Tool Call: Restock Inventory
-      if (lower.includes('restock') || lower.includes('stock') || lower.includes('inventory')) {
+      // 3. Voice Tool Call: Restock Inventory PO (Action prompt)
+      if (
+        lower.includes('issue po') ||
+        lower.includes('draft restock po') ||
+        lower.includes('create restock order')
+      ) {
         const pending: PendingVoiceAction = {
           id: `act-restock-${Date.now()}`,
           actionType: 'RESTOCK_INVENTORY',
@@ -136,32 +216,9 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
         return;
       }
 
-      // 3. Voice Navigation Commands
-      if (lower.includes('open order') || lower.includes('show order')) {
-        voiceAI.speak('Opening your live orders dashboard.');
-        onOpenChange(false);
-        router.push('/orders');
-        return;
-      }
-
-      if (lower.includes('open product') || lower.includes('catalog')) {
-        voiceAI.speak('Navigating to your product catalog.');
-        onOpenChange(false);
-        router.push('/products');
-        return;
-      }
-
-      if (lower.includes('open analytics') || lower.includes('chart')) {
-        voiceAI.speak('Opening executive analytics dashboard.');
-        onOpenChange(false);
-        router.push('/analytics');
-        return;
-      }
-
-      // 4. General Business Copilot query with memory awareness
-      const memContext = memoryEngine.getFormattedContextForPrompt();
+      // 4. General Business Copilot query with dynamic intent resolution & clean spoken audio
       const response = copilotEngine.processQuery(text);
-      const spokenText = `${memContext ? memContext + '. ' : ''}${response.text}`;
+      const spokenText = response.text;
 
       setConversationHistory((prev) => [
         ...prev,
