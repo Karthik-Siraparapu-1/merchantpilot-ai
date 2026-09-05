@@ -384,110 +384,130 @@ export default function InventoryPage() {
             actionLabel="Retry"
             onAction={() => void refetch()}
           />
-        ) : data?.data.length === 0 ? (
-          <EmptyState
-            icon={Boxes}
-            title="No Inventory Items Found"
-            description={
-              activeTab === 'low-stock'
-                ? 'All products are safely above their reorder thresholds!'
-                : 'No inventory tracked for this store.'
-            }
-          />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product / SKU</TableHead>
-                <TableHead>Available Stock</TableHead>
-                <TableHead>Reserved Stock</TableHead>
-                <TableHead>Reorder Threshold</TableHead>
-                <TableHead>Health Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.data.map((item) => {
-                const isOut = item.availableQuantity === 0;
-                const isLow = item.availableQuantity <= item.reorderThreshold && !isOut;
+          (() => {
+            const displayedItems = (data?.data || []).filter((item) =>
+              activeTab === 'low-stock'
+                ? item.availableQuantity <= item.reorderThreshold ||
+                  item.isLowStock ||
+                  item.isOutOfStock
+                : true
+            );
 
-                return (
-                  <TableRow key={item.id}>
-                    {/* Product / SKU */}
-                    <TableCell>
-                      <div className="font-semibold text-foreground text-xs">
-                        {item.product?.title || 'Product SKU'}
-                      </div>
-                      <div className="text-[11px] font-mono text-muted-foreground">
-                        {item.product?.sku || 'SKU'}
-                      </div>
-                    </TableCell>
+            if (displayedItems.length === 0) {
+              return (
+                <EmptyState
+                  icon={Boxes}
+                  title="No Inventory Items Found"
+                  description={
+                    activeTab === 'low-stock'
+                      ? 'All products are safely above their reorder thresholds!'
+                      : 'No inventory tracked for this store.'
+                  }
+                />
+              );
+            }
 
-                    {/* Available */}
-                    <TableCell className="font-mono text-xs font-semibold">
-                      <span
-                        className={
-                          isOut ? 'text-destructive' : isLow ? 'text-amber-500' : 'text-emerald-500'
-                        }
-                      >
-                        {item.availableQuantity} units
-                      </span>
-                    </TableCell>
-
-                    {/* Reserved */}
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {item.reservedQuantity} units
-                    </TableCell>
-
-                    {/* Reorder Threshold */}
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {item.reorderThreshold} units
-                    </TableCell>
-
-                    {/* Health Status */}
-                    <TableCell>
-                      {isOut ? (
-                        <Badge variant="destructive" className="text-[10px]">
-                          Out of Stock
-                        </Badge>
-                      ) : isLow ? (
-                        <Badge variant="warning" className="text-[10px]">
-                          Low Stock Alert
-                        </Badge>
-                      ) : (
-                        <Badge variant="success" className="text-[10px]">
-                          Healthy Stock
-                        </Badge>
-                      )}
-                    </TableCell>
-
-                    {/* Actions */}
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 text-xs shadow-2xs"
-                          onClick={() => setAdjustItem(item)}
-                        >
-                          <Sliders className="mr-1 h-3.5 w-3.5" /> Adjust
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground"
-                          onClick={() => setAuditItem(item)}
-                          title="View Audit Ledger"
-                        >
-                          <History className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            return (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product / SKU</TableHead>
+                    <TableHead>Available Stock</TableHead>
+                    <TableHead>Reserved Stock</TableHead>
+                    <TableHead>Reorder Threshold</TableHead>
+                    <TableHead>Health Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                  {displayedItems.map((item) => {
+                    const isOut = item.availableQuantity === 0;
+                    const isLow = item.availableQuantity <= item.reorderThreshold && !isOut;
+
+                    return (
+                      <TableRow key={item.id}>
+                        {/* Product / SKU */}
+                        <TableCell>
+                          <div className="font-semibold text-foreground text-xs">
+                            {item.product?.title || 'Product SKU'}
+                          </div>
+                          <div className="text-[11px] font-mono text-muted-foreground">
+                            {item.product?.sku || 'SKU'}
+                          </div>
+                        </TableCell>
+
+                        {/* Available */}
+                        <TableCell className="font-mono text-xs font-semibold">
+                          <span
+                            className={
+                              isOut
+                                ? 'text-destructive'
+                                : isLow
+                                  ? 'text-amber-500'
+                                  : 'text-emerald-500'
+                            }
+                          >
+                            {item.availableQuantity} units
+                          </span>
+                        </TableCell>
+
+                        {/* Reserved */}
+                        <TableCell className="font-mono text-xs text-muted-foreground">
+                          {item.reservedQuantity} units
+                        </TableCell>
+
+                        {/* Reorder Threshold */}
+                        <TableCell className="font-mono text-xs text-muted-foreground">
+                          {item.reorderThreshold} units
+                        </TableCell>
+
+                        {/* Health Status */}
+                        <TableCell>
+                          {isOut ? (
+                            <Badge variant="destructive" className="text-[10px]">
+                              Out of Stock
+                            </Badge>
+                          ) : isLow ? (
+                            <Badge variant="warning" className="text-[10px]">
+                              Low Stock Alert
+                            </Badge>
+                          ) : (
+                            <Badge variant="success" className="text-[10px]">
+                              Healthy Stock
+                            </Badge>
+                          )}
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 text-xs shadow-2xs"
+                              onClick={() => setAdjustItem(item)}
+                            >
+                              <Sliders className="mr-1 h-3.5 w-3.5" /> Adjust
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground"
+                              onClick={() => setAuditItem(item)}
+                              title="View Audit Ledger"
+                            >
+                              <History className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            );
+          })()
         )}
 
         {/* Pagination Controls */}

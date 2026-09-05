@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Sparkles, ShieldCheck, Zap, Layers } from 'lucide-react';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -12,15 +13,28 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
 
-        {/* Brand Header */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/30">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div>
-            <span className="text-xl font-bold tracking-tight text-white">MerchantPilot AI</span>
-            <span className="block text-xs font-mono text-indigo-400">Enterprise Commerce OS</span>
-          </div>
+        {/* Brand Header & Back Link */}
+        <div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-8"
+          >
+            &larr; Back to Home
+          </Link>
+
+          <Link href="/" className="relative z-10 flex items-center gap-3 group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 group-hover:bg-indigo-500 transition-colors">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-200 transition-colors">
+                MerchantPilot AI
+              </span>
+              <span className="block text-xs font-mono text-indigo-400">
+                Enterprise Commerce OS
+              </span>
+            </div>
+          </Link>
         </div>
 
         {/* Value Proposition */}
@@ -64,8 +78,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Right Interactive Form Area */}
-      <div className="flex flex-1 items-center justify-center p-6 sm:p-12 bg-background">
-        <div className="w-full max-w-md">{children}</div>
+      <div className="flex flex-1 flex-col items-center justify-center p-6 sm:p-12 bg-background relative">
+        <div className="w-full max-w-md">
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              &larr; Back to Landing Page
+            </Link>
+          </div>
+          {children}
+        </div>
       </div>
     </div>
   );

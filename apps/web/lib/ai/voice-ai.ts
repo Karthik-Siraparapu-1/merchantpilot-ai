@@ -89,7 +89,7 @@ export class VoiceAIEngine {
 
       if (SpeechRecognitionImpl) {
         this.recognition = new SpeechRecognitionImpl();
-        this.recognition.continuous = false;
+        this.recognition.continuous = true;
         this.recognition.interimResults = true;
         this.recognition.lang = 'en-US';
 
@@ -100,6 +100,15 @@ export class VoiceAIEngine {
         };
 
         this.recognition.onend = () => {
+          // Auto-restart recognition if continuous mode is active and user didn't stop listening
+          if (this.isListeningInternal && !this.isSpeakingInternal && this.continuousConversation) {
+            try {
+              this.recognition?.start();
+              return;
+            } catch {
+              // Ignore restart collision error
+            }
+          }
           this.isListeningInternal = false;
           this.stopAudioWaveSimulation();
           this.notifyState();
@@ -126,7 +135,11 @@ export class VoiceAIEngine {
           }
         };
 
-        this.recognition.onerror = () => {
+        this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          // Ignore non-fatal background speech errors like 'no-speech' or 'aborted'
+          if (event?.error === 'no-speech' || event?.error === 'aborted') {
+            return;
+          }
           this.isListeningInternal = false;
           this.stopAudioWaveSimulation();
           this.notifyState();
@@ -166,9 +179,10 @@ export class VoiceAIEngine {
   }
 
   public startListening(): void {
-    if (!this.recognition || this.isListeningInternal) return;
+    if (!this.recognition) return;
     this.stopSpeaking();
     this.isThinkingInternal = false;
+    this.isListeningInternal = true;
     try {
       this.recognition.start();
     } catch {
@@ -177,12 +191,15 @@ export class VoiceAIEngine {
   }
 
   public stopListening(): void {
-    if (!this.recognition || !this.isListeningInternal) return;
+    this.isListeningInternal = false;
+    if (!this.recognition) return;
     try {
       this.recognition.stop();
     } catch {
       // ignored
     }
+    this.stopAudioWaveSimulation();
+    this.notifyState();
   }
 
   public setThinking(thinking: boolean): void {

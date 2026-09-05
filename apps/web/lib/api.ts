@@ -527,7 +527,7 @@ export const api = {
         const res = await apiClient.get<InventoryListResponse>('/inventory', { params });
         return res.data;
       } catch {
-        const items: InventoryItem[] = MOCK_PRODUCTS.map((p) => ({
+        let items: InventoryItem[] = MOCK_PRODUCTS.map((p) => ({
           id: `inv-${p.id}`,
           productId: p.id,
           storeId: p.storeId,
@@ -549,6 +549,19 @@ export const api = {
             status: p.status
           }
         }));
+
+        if (params?.lowStockOnly) {
+          items = items.filter((item) => item.isLowStock);
+        }
+
+        if (params?.search) {
+          const s = params.search.toLowerCase();
+          items = items.filter(
+            (item) =>
+              item.product?.title.toLowerCase().includes(s) ||
+              item.product?.sku.toLowerCase().includes(s)
+          );
+        }
 
         return {
           data: items,
