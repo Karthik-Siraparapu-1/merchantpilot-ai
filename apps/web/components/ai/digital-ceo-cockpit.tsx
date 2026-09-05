@@ -4,7 +4,19 @@ import React from 'react';
 import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Crown, Sparkles, ArrowUpRight } from 'lucide-react';
+import {
+  Crown,
+  Sparkles,
+  ArrowUpRight,
+  TrendingUp,
+  ShieldCheck,
+  Zap,
+  Cpu,
+  BarChart3,
+  AlertTriangle,
+  CheckCircle2,
+  Activity
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function DigitalCEOCockpit() {
@@ -73,83 +85,204 @@ export function DigitalCEOCockpit() {
         </div>
       </div>
 
-      {/* 4 CEO Pillar Telemetry Cards */}
+      {/* EXECUTIVE MODE: Business Pillar Cards */}
       {mode === 'EXECUTIVE' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
-          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Revenue</span>
-              <span className="text-emerald-500 font-bold">Excellent</span>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
+            <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3 text-emerald-500" />
+                  Revenue
+                </span>
+                <span className="text-emerald-500 font-bold">Excellent</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">₹2.42L / Day</div>
+              <span className="text-[10px] text-emerald-500 block">↑ 14% vs baseline</span>
             </div>
-            <div className="text-lg font-bold text-foreground">₹2.42L / Day</div>
-            <span className="text-[10px] text-emerald-500 block">↑ 14% vs baseline</span>
+
+            <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3 text-amber-500" />
+                  Inventory
+                </span>
+                <span className="text-amber-500 font-bold">Needs Attention</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">2 Low SKUs</div>
+              <span className="text-[10px] text-amber-500 block">Restock PO drafted</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3 text-emerald-500" />
+                  Cash Flow
+                </span>
+                <span className="text-emerald-500 font-bold">Healthy</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">38.2% Margin</div>
+              <span className="text-[10px] text-muted-foreground block">T+0 settlement 65%</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                  Next Week Projection
+                </span>
+                <span className="text-primary font-bold">+18% Lift</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">₹16.4L Target</div>
+              <span className="text-[10px] text-primary block">96% confidence</span>
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Inventory</span>
-              <span className="text-amber-500 font-bold">Needs Attention</span>
+          {/* Executive Strategic Directives */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                <span className="text-[11px] font-bold text-emerald-500 uppercase">
+                  Growth Lever
+                </span>
+              </div>
+              <p className="text-[11px] text-foreground leading-relaxed">
+                Computer Peripherals line is surging at <strong>+32% MoM</strong>. Capitalize by
+                expanding SKU depth with USB-C docks and hub accessories.
+              </p>
             </div>
-            <div className="text-lg font-bold text-foreground">2 Low SKUs</div>
-            <span className="text-[10px] text-amber-500 block">Restock PO drafted</span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Cash Flow</span>
-              <span className="text-emerald-500 font-bold">Healthy</span>
+            <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                <span className="text-[11px] font-bold text-amber-500 uppercase">Bottleneck</span>
+              </div>
+              <p className="text-[11px] text-foreground leading-relaxed">
+                4-day supplier transit delay on Wireless Mice from Apex Logistics is constraining
+                fulfillment velocity. Consider <strong>secondary supplier</strong> onboarding.
+              </p>
             </div>
-            <div className="text-lg font-bold text-foreground">38.2% Margin</div>
-            <span className="text-[10px] text-muted-foreground block">T+0 settlement 65%</span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Next Week Projection</span>
-              <span className="text-primary font-bold">+18% Lift</span>
+            <div className="p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-purple-500" />
+                <span className="text-[11px] font-bold text-purple-500 uppercase">Opportunity</span>
+              </div>
+              <p className="text-[11px] text-foreground leading-relaxed">
+                Competitor stockout detected. +8% price lift on Ergonomic Mouse will add{' '}
+                <strong>₹42,000/mo</strong> net margin with &lt;2% conversion impact.
+              </p>
             </div>
-            <div className="text-lg font-bold text-foreground">₹16.4L Target</div>
-            <span className="text-[10px] text-primary block">96% confidence</span>
           </div>
-        </div>
+        </>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
-          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Worker Mesh</span>
-              <span className="text-indigo-400 font-bold">8 Agents</span>
+        <>
+          {/* OPERATOR MODE: System Telemetry Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
+            <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-indigo-500/5 space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <Cpu className="h-3 w-3 text-indigo-400" />
+                  Worker Mesh
+                </span>
+                <span className="text-indigo-400 font-bold">8 Agents</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">Active Mesh</div>
+              <span className="text-[10px] text-emerald-500 block">100% thread uptime</span>
             </div>
-            <div className="text-lg font-bold text-foreground">Active Mesh</div>
-            <span className="text-[10px] text-emerald-500 block">100% thread uptime</span>
+
+            <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <Zap className="h-3 w-3 text-emerald-400" />
+                  Dispatch Latency
+                </span>
+                <span className="text-emerald-500 font-bold">Sub-Second</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">14ms Avg</div>
+              <span className="text-[10px] text-emerald-500 block">Zero bottlenecks</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3 text-muted-foreground" />
+                  Queue Depth
+                </span>
+                <span className="text-emerald-500 font-bold">Healthy</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">0 Pending</div>
+              <span className="text-[10px] text-muted-foreground block">142 events / min</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground uppercase flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3 text-indigo-400" />
+                  RLS Guardrails
+                </span>
+                <span className="text-indigo-400 font-bold">Enforced</span>
+              </div>
+              <div className="text-lg font-bold text-foreground">Multi-Tenant</div>
+              <span className="text-[10px] text-indigo-400 block">0 Policy Violations</span>
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Dispatch Latency</span>
-              <span className="text-emerald-500 font-bold">Sub-Second</span>
+          {/* Operator Live Event Stream */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">
+              <Activity className="h-3 w-3 animate-pulse" />
+              Live Agent Event Stream
             </div>
-            <div className="text-lg font-bold text-foreground">14ms Avg</div>
-            <span className="text-[10px] text-emerald-500 block">Zero bottlenecks</span>
-          </div>
-
-          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">Queue Depth</span>
-              <span className="text-emerald-500 font-bold">Healthy</span>
+            <div className="space-y-1.5">
+              {[
+                {
+                  agent: 'Atlas',
+                  event: 'PO-8821 submitted → Apex Logistics webhook ACK received',
+                  time: '14ms',
+                  color: 'text-emerald-400'
+                },
+                {
+                  agent: 'Sentinel',
+                  event: 'Fraud scan complete: 41/41 orders processed, 1 flagged',
+                  time: '8ms',
+                  color: 'text-red-400'
+                },
+                {
+                  agent: 'Pulse',
+                  event: 'Razorpay→Cashfree failover route healthy, latency 12ms',
+                  time: '12ms',
+                  color: 'text-blue-400'
+                },
+                {
+                  agent: 'Vega',
+                  event: 'Price elasticity model retrained on 10K synthetic scenarios',
+                  time: '340ms',
+                  color: 'text-purple-400'
+                },
+                {
+                  agent: 'Cortex',
+                  event: 'Consensus lock acquired — Atlas+Vega conflict resolved',
+                  time: '6ms',
+                  color: 'text-indigo-400'
+                }
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-2.5 rounded-lg bg-background/70 border border-border/50 text-[11px] font-mono"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${item.color.replace('text-', 'bg-')} animate-pulse`}
+                    />
+                    <span className={`font-bold ${item.color}`}>[{item.agent}]</span>
+                    <span className="text-foreground">{item.event}</span>
+                  </div>
+                  <span className="text-muted-foreground shrink-0 ml-2">{item.time}</span>
+                </div>
+              ))}
             </div>
-            <div className="text-lg font-bold text-foreground">0 Pending</div>
-            <span className="text-[10px] text-muted-foreground block">142 events / min</span>
           </div>
-
-          <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground uppercase">RLS Guardrails</span>
-              <span className="text-indigo-400 font-bold">Enforced</span>
-            </div>
-            <div className="text-lg font-bold text-foreground">Multi-Tenant</div>
-            <span className="text-[10px] text-indigo-400 block">0 Policy Violations</span>
-          </div>
-        </div>
+        </>
       )}
 
       {/* CEO Executive Summary & Guidance */}

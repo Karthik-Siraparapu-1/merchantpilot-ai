@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, Sparkles, Zap, CheckCircle2, Brain } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Mic, MicOff, Volume2, Sparkles, Zap, CheckCircle2, Brain, Send } from 'lucide-react';
 import { voiceAI, type VoiceState, type PendingVoiceAction } from '@/lib/ai/voice-ai';
 import { copilotEngine } from '@/lib/ai/copilot-engine';
 import { memoryEngine } from '@/lib/ai/memory-engine';
@@ -35,6 +36,7 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
   });
 
   const [continuousLoop, setContinuousLoop] = useState(true);
+  const [typedInput, setTypedInput] = useState('');
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ speaker: 'USER' | 'AI'; message: string; timestamp: string }>
   >([
@@ -230,19 +232,31 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
     [onOpenChange, router]
   );
 
+  // Stable ref for the command handler to avoid useEffect re-runs on every render
+  const commandHandlerRef = useRef(handleSpokenCommand);
+  useEffect(() => {
+    commandHandlerRef.current = handleSpokenCommand;
+  }, [handleSpokenCommand]);
+
   useEffect(() => {
     voiceAI.onStateChange((state) => {
       setVoiceState(state);
     });
 
     voiceAI.setCommandHandler((cmd) => {
-      handleSpokenCommand(cmd);
+      commandHandlerRef.current(cmd);
     });
 
     if (open) {
       voiceAI.startListening();
     }
-  }, [open, handleSpokenCommand]);
+
+    return () => {
+      if (!open) {
+        voiceAI.stopListening();
+      }
+    };
+  }, [open]);
 
   const toggleMic = () => {
     if (voiceState.isListening) {
@@ -454,23 +468,50 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
           ))}
         </div>
 
-        {/* Quick Verbal Preset Chips */}
-        <div className="p-3 bg-muted/30 border-t border-border/60 flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] font-medium text-muted-foreground mr-1">Voice Prompts:</span>
-          {[
-            'Increase price of Wireless Mouse',
-            'Why did sales drop?',
-            'Which products should I restock?',
-            'Open Orders'
-          ].map((prompt, i) => (
-            <button
-              key={i}
-              onClick={() => handleSpokenCommand(prompt)}
-              className="text-[10px] px-2.5 py-1 rounded-full border border-border/70 bg-card hover:bg-muted text-foreground transition-colors font-medium"
-            >
-              "{prompt}"
-            </button>
-          ))}
+        {/* Quick Verbal Preset Chips & Text Command Input */}
+        <div className="p-3 bg-muted/30 border-t border-border/60 space-y-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-medium text-muted-foreground mr-1">
+              Voice Prompts:
+            </span>
+            {[
+              'Increase price of Wireless Mouse',
+              'Why did sales drop?',
+              'Which products should I restock?',
+              'Open Orders'
+            ].map((prompt, i) => (
+              <button
+                key={i}
+                onClick={() => handleSpokenCommand(prompt)}
+                className="text-[10px] px-2.5 py-1 rounded-full border border-border/70 bg-card hover:bg-muted text-foreground transition-colors font-medium"
+              >
+                "{prompt}"
+              </button>
+            ))}
+          </div>
+
+          {/* Interactive Keyboard / Typed Command Input */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!typedInput.trim()) return;
+              const cmd = typedInput.trim();
+              setTypedInput('');
+              handleSpokenCommand(cmd);
+            }}
+            className="flex items-center gap-2 pt-1"
+          >
+            <Input
+              type="text"
+              placeholder="Type a message or command to the AI agent..."
+              value={typedInput}
+              onChange={(e) => setTypedInput(e.target.value)}
+              className="text-xs h-9 bg-background/80"
+            />
+            <Button type="submit" size="sm" className="h-9 text-xs px-3.5 gap-1 shadow-xs">
+              <Send className="h-3.5 w-3.5" /> Send
+            </Button>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

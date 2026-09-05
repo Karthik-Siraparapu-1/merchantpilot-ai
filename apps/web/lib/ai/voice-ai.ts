@@ -312,9 +312,9 @@ export class VoiceAIEngine {
       }
     }
 
-    if (this.onCommandRecognized) {
-      this.onCommandRecognized(text);
-    }
+    // NOTE: Do NOT call this.onCommandRecognized(text) here.
+    // The onresult handler already dispatches final commands to the command handler.
+    // Calling it again here would cause double-processing and repeated responses.
   }
 
   public speak(text: string, onDone?: () => void): void {
