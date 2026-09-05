@@ -14,3 +14,7 @@ __pycache__/
 .venv/
 # macOS
 .DS_Store
+
+# Internal recording scripts
+docs/demo-video-script.md
+
