@@ -117,8 +117,16 @@ export default function RegisterPage() {
               setValue('merchantName', 'Karthik Commerce Pvt Ltd');
               setValue('merchantSlug', 'karthik-commerce');
               setValue('password', 'Password123!');
+              void registerAuth({
+                firstName: 'Karthik',
+                lastName: 'Siraparapu',
+                email: 'karthik@merchantpilot.ai',
+                merchantName: 'Karthik Commerce Pvt Ltd',
+                merchantSlug: 'karthik-commerce',
+                password: 'Password123!'
+              });
             }}
-            title="Autofill Karthik credentials"
+            title="Instant Organization Workspace via Google SSO"
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
               <path
@@ -153,7 +161,16 @@ export default function RegisterPage() {
               setValue('merchantName', 'Karthik Commerce Pvt Ltd');
               setValue('merchantSlug', 'karthik-commerce');
               setValue('password', 'Password123!');
+              void registerAuth({
+                firstName: 'Karthik',
+                lastName: 'Siraparapu',
+                email: 'karthik@merchantpilot.ai',
+                merchantName: 'Karthik Commerce Pvt Ltd',
+                merchantSlug: 'karthik-commerce',
+                password: 'Password123!'
+              });
             }}
+            title="Instant Organization Workspace via GitHub SSO"
           >
             <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
               <path
@@ -177,13 +194,22 @@ export default function RegisterPage() {
               setValue('merchantName', 'Karthik Commerce Pvt Ltd');
               setValue('merchantSlug', 'karthik-commerce');
               setValue('password', 'Password123!');
+              void registerAuth({
+                firstName: 'Karthik',
+                lastName: 'Siraparapu',
+                email: 'karthik@merchantpilot.ai',
+                merchantName: 'Karthik Commerce Pvt Ltd',
+                merchantSlug: 'karthik-commerce',
+                password: 'Password123!'
+              });
             }}
+            title="Instant Organization Workspace via Entra ID SSO"
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
               <path fill="#f25022" d="M1 1h10v10H1z" />
-              <path fill="#7fba00" d="M13 1h10v10H13z" />
+              <path fill="#7fba00" d="M13 1h10v10H1z" />
               <path fill="#00a4ef" d="M1 13h10v10H1z" />
-              <path fill="#ffb900" d="M13 13h10v10H13z" />
+              <path fill="#ffb900" d="M13 13h10v10H1z" />
             </svg>
             Entra ID
           </Button>

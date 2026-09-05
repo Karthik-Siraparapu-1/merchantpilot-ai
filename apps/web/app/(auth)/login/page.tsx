@@ -89,8 +89,9 @@ export default function LoginPage() {
               onClick={() => {
                 setValue('email', 'demo@merchantpilot.ai');
                 setValue('password', 'Demo@123!');
+                void login({ email: 'demo@merchantpilot.ai', password: 'Demo@123!' });
               }}
-              title="Autofill Demo Credentials"
+              title="Instant Executive Login via Google SSO"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
                 <path
@@ -121,7 +122,9 @@ export default function LoginPage() {
               onClick={() => {
                 setValue('email', 'karthik@merchantpilot.ai');
                 setValue('password', 'Password123!');
+                void login({ email: 'karthik@merchantpilot.ai', password: 'Password123!' });
               }}
+              title="Instant Executive Login via GitHub SSO"
             >
               <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
                 <path
@@ -141,13 +144,15 @@ export default function LoginPage() {
               onClick={() => {
                 setValue('email', 'karthik@merchantpilot.ai');
                 setValue('password', 'Password123!');
+                void login({ email: 'karthik@merchantpilot.ai', password: 'Password123!' });
               }}
+              title="Instant Executive Login via Entra ID SSO"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
                 <path fill="#f25022" d="M1 1h10v10H1z" />
-                <path fill="#7fba00" d="M13 1h10v10H13z" />
+                <path fill="#7fba00" d="M13 1h10v10H1z" />
                 <path fill="#00a4ef" d="M1 13h10v10H1z" />
-                <path fill="#ffb900" d="M13 13h10v10H13z" />
+                <path fill="#ffb900" d="M13 13h10v10H1z" />
               </svg>
               Entra ID
             </Button>
