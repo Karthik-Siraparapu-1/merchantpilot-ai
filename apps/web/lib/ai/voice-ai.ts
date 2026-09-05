@@ -81,6 +81,8 @@ export class VoiceAIEngine {
   private pendingActionInternal: PendingVoiceAction | null = null;
   private audioWaveInterval: ReturnType<typeof setInterval> | null = null;
   private currentWaveLevels = [20, 45, 80, 55, 30];
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private restartTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -88,62 +90,91 @@ export class VoiceAIEngine {
       const SpeechRecognitionImpl = win.SpeechRecognition || win.webkitSpeechRecognition;
 
       if (SpeechRecognitionImpl) {
-        this.recognition = new SpeechRecognitionImpl();
-        this.recognition.continuous = true;
-        this.recognition.interimResults = true;
-        this.recognition.lang = 'en-US';
+        try {
+          this.recognition = new SpeechRecognitionImpl();
+          this.recognition.continuous = true;
+          this.recognition.interimResults = true;
+          this.recognition.lang = 'en-US';
 
-        this.recognition.onstart = () => {
-          this.isListeningInternal = true;
-          this.startAudioWaveSimulation();
-          this.notifyState();
-        };
+          this.recognition.onstart = () => {
+            this.isListeningInternal = true;
+            this.startAudioWaveSimulation();
+            this.notifyState();
+          };
 
-        this.recognition.onend = () => {
-          // Auto-restart recognition if continuous mode is active and user didn't stop listening
-          if (this.isListeningInternal && !this.isSpeakingInternal && this.continuousConversation) {
-            try {
-              this.recognition?.start();
+          this.recognition.onend = () => {
+            // Delay restart slightly to allow Chrome audio thread to transition out of stopped state
+            if (
+              this.isListeningInternal &&
+              !this.isSpeakingInternal &&
+              this.continuousConversation
+            ) {
+              if (this.restartTimer) clearTimeout(this.restartTimer);
+              this.restartTimer = setTimeout(() => {
+                if (this.isListeningInternal && !this.isSpeakingInternal) {
+                  try {
+                    this.recognition?.start();
+                  } catch {
+                    // Ignore transient restart collisions
+                  }
+                }
+              }, 200);
               return;
-            } catch {
-              // Ignore restart collision error
             }
-          }
-          this.isListeningInternal = false;
-          this.stopAudioWaveSimulation();
-          this.notifyState();
-        };
+            this.isListeningInternal = false;
+            this.stopAudioWaveSimulation();
+            this.notifyState();
+          };
 
-        this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-          let currentTranscript = '';
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            const resultItem = event.results[i];
-            if (resultItem?.[0]) {
-              currentTranscript += resultItem[0].transcript;
+          this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+            let currentTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              const resultItem = event.results[i];
+              if (resultItem?.[0]) {
+                currentTranscript += resultItem[0].transcript;
+              }
             }
-          }
-          this.lastTranscript = currentTranscript;
-          this.notifyState();
+            this.lastTranscript = currentTranscript;
+            this.notifyState();
 
-          const lastResult = event.results[event.results.length - 1];
-          if (lastResult?.isFinal) {
-            const finalCommand = currentTranscript.trim();
-            if (this.onCommandRecognized) {
-              this.onCommandRecognized(finalCommand);
+            const lastResult = event.results[event.results.length - 1];
+            if (lastResult?.isFinal) {
+              const finalCommand = currentTranscript.trim();
+              if (finalCommand && this.onCommandRecognized) {
+                this.onCommandRecognized(finalCommand);
+              }
+              void this.handleFinalCommand(finalCommand);
             }
-            void this.handleFinalCommand(finalCommand);
-          }
-        };
+          };
 
-        this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          // Ignore non-fatal background speech errors like 'no-speech' or 'aborted'
-          if (event?.error === 'no-speech' || event?.error === 'aborted') {
-            return;
-          }
-          this.isListeningInternal = false;
-          this.stopAudioWaveSimulation();
-          this.notifyState();
-        };
+          this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+            // Non-fatal background speech errors like 'no-speech' or 'aborted'
+            if (event?.error === 'no-speech' || event?.error === 'aborted') {
+              if (
+                this.isListeningInternal &&
+                !this.isSpeakingInternal &&
+                this.continuousConversation
+              ) {
+                if (this.restartTimer) clearTimeout(this.restartTimer);
+                this.restartTimer = setTimeout(() => {
+                  if (this.isListeningInternal && !this.isSpeakingInternal) {
+                    try {
+                      this.recognition?.start();
+                    } catch {
+                      // safe catch
+                    }
+                  }
+                }, 250);
+              }
+              return;
+            }
+            this.isListeningInternal = false;
+            this.stopAudioWaveSimulation();
+            this.notifyState();
+          };
+        } catch {
+          this.recognition = null;
+        }
       }
     }
   }
@@ -179,24 +210,34 @@ export class VoiceAIEngine {
   }
 
   public startListening(): void {
-    if (!this.recognition) return;
     this.stopSpeaking();
     this.isThinkingInternal = false;
     this.isListeningInternal = true;
+    if (!this.recognition) {
+      this.notifyState();
+      return;
+    }
     try {
       this.recognition.start();
     } catch {
-      // safe fallback if recognition instance state is restarting
+      // Safe fallback if recognition instance state is already starting/active
     }
+    this.startAudioWaveSimulation();
+    this.notifyState();
   }
 
   public stopListening(): void {
     this.isListeningInternal = false;
-    if (!this.recognition) return;
-    try {
-      this.recognition.stop();
-    } catch {
-      // ignored
+    if (this.restartTimer) {
+      clearTimeout(this.restartTimer);
+      this.restartTimer = null;
+    }
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {
+        // ignored
+      }
     }
     this.stopAudioWaveSimulation();
     this.notifyState();
@@ -311,35 +352,49 @@ export class VoiceAIEngine {
         return;
       }
     }
-
-    // NOTE: Do NOT call this.onCommandRecognized(text) here.
-    // The onresult handler already dispatches final commands to the command handler.
-    // Calling it again here would cause double-processing and repeated responses.
   }
 
   public speak(text: string, onDone?: () => void): void {
+    this.stopListening();
+    this.stopSpeaking();
+
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       if (onDone) onDone();
       return;
     }
 
-    this.stopListening();
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      // safe
+    }
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.05;
     utterance.pitch = 1.0;
 
     // Pick best available modern English voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const premiumVoice = voices.find(
-      (v) =>
-        (v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('Natural')) &&
-        v.lang.startsWith('en')
-    );
-    if (premiumVoice) {
-      utterance.voice = premiumVoice;
+    try {
+      const voices = window.speechSynthesis.getVoices();
+      const premiumVoice = voices.find(
+        (v) =>
+          (v.name.includes('Samantha') ||
+            v.name.includes('Google') ||
+            v.name.includes('Natural') ||
+            v.name.includes('Karen') ||
+            v.name.includes('Daniel')) &&
+          v.lang.startsWith('en')
+      );
+      if (premiumVoice) {
+        utterance.voice = premiumVoice;
+      }
+    } catch {
+      // fallback to default voice
     }
+
+    this.currentUtterance = utterance;
+    // Bind to window to prevent Chromium V8 garbage collection mid-speech
+    (window as unknown as Record<string, unknown>)._activeUtterance = utterance;
 
     this.lastSpokenResponse = text;
     this.isSpeakingInternal = true;
@@ -347,8 +402,12 @@ export class VoiceAIEngine {
     this.startAudioWaveSimulation();
     this.notifyState();
 
+    let finished = false;
     const finishSpeaking = () => {
+      if (finished) return;
+      finished = true;
       this.isSpeakingInternal = false;
+      this.currentUtterance = null;
       this.stopAudioWaveSimulation();
       this.notifyState();
 
@@ -360,19 +419,36 @@ export class VoiceAIEngine {
           if (!this.isSpeakingInternal && !this.isListeningInternal) {
             this.startListening();
           }
-        }, 350);
+        }, 300);
       }
     };
 
     utterance.onend = finishSpeaking;
     utterance.onerror = finishSpeaking;
 
-    window.speechSynthesis.speak(utterance);
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      finishSpeaking();
+    }
+
+    // Safety fallback: if speech synthesis hangs or fails silently in background, release state after estimated speech duration
+    const estimatedDurationMs = Math.max(2500, text.length * 70);
+    setTimeout(() => {
+      if (this.isSpeakingInternal && this.currentUtterance === utterance) {
+        finishSpeaking();
+      }
+    }, estimatedDurationMs);
   }
 
   public stopSpeaking(): void {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // safe
+      }
+      this.currentUtterance = null;
       this.isSpeakingInternal = false;
       this.stopAudioWaveSimulation();
       this.notifyState();
@@ -398,7 +474,8 @@ export class VoiceAIEngine {
       clearInterval(this.audioWaveInterval);
       this.audioWaveInterval = null;
     }
-    this.currentWaveLevels = [15, 20, 25, 20, 15];
+    this.currentWaveLevels = [20, 20, 20, 20, 20];
+    this.notifyState();
   }
 
   public getAvatarState(): VoiceAIAvatarState {
@@ -409,25 +486,22 @@ export class VoiceAIEngine {
   }
 
   private notifyState(): void {
-    if (!this.onStateChangeCallback) return;
-    const isSpeaking =
-      this.isSpeakingInternal ||
-      (typeof window !== 'undefined' && !!window.speechSynthesis?.speaking);
-
-    this.onStateChangeCallback({
-      isListening: this.isListeningInternal,
-      isSpeaking,
-      isThinking: this.isThinkingInternal,
-      avatarState: this.getAvatarState(),
-      transcript: this.lastTranscript,
-      streamingToken: this.streamingToken,
-      lastAiResponse: this.lastSpokenResponse,
-      supported: this.isSupported(),
-      audioWaveLevels: this.currentWaveLevels,
-      pendingAction: this.pendingActionInternal,
-      wakeWordDetected: this.wakeWordDetected,
-      context: this.context
-    });
+    if (this.onStateChangeCallback) {
+      this.onStateChangeCallback({
+        isListening: this.isListeningInternal,
+        isSpeaking: this.isSpeakingInternal,
+        isThinking: this.isThinkingInternal,
+        avatarState: this.getAvatarState(),
+        transcript: this.lastTranscript,
+        streamingToken: this.streamingToken,
+        lastAiResponse: this.lastSpokenResponse,
+        supported: this.isSupported(),
+        audioWaveLevels: this.currentWaveLevels,
+        pendingAction: this.pendingActionInternal,
+        wakeWordDetected: this.wakeWordDetected,
+        context: this.context
+      });
+    }
   }
 }
 

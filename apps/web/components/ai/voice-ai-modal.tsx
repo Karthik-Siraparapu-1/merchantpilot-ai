@@ -249,12 +249,14 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
 
     if (open) {
       voiceAI.startListening();
+    } else {
+      voiceAI.stopSpeaking();
+      voiceAI.stopListening();
     }
 
     return () => {
-      if (!open) {
-        voiceAI.stopListening();
-      }
+      voiceAI.stopSpeaking();
+      voiceAI.stopListening();
     };
   }, [open]);
 
