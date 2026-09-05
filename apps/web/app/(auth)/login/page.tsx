@@ -34,7 +34,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
@@ -77,6 +77,20 @@ export default function LoginPage() {
             Continue to MerchantPilot AI Command Center
           </CardDescription>
         </CardHeader>
+
+        {user && (
+          <div className="mx-6 mb-3 p-3 rounded-lg border border-primary/30 bg-primary/10 text-xs flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-foreground">Active Session</p>
+              <p className="text-muted-foreground">{user.email}</p>
+            </div>
+            <Link href="/dashboard">
+              <Button size="sm" variant="default" className="text-xs gap-1">
+                Go to Dashboard <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          </div>
+        )}
 
         <div className="px-6 pb-2">
           {/* Enterprise SSO Options */}

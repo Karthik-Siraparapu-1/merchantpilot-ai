@@ -188,8 +188,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (!user && !isAuthRoute && pathname !== '/') {
       router.push('/login');
-    } else if (user && isAuthRoute) {
-      router.push('/dashboard');
     }
   }, [user, isLoading, pathname, router]);
 
