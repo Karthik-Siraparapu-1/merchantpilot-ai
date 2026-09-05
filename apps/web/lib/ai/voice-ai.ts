@@ -1,8 +1,7 @@
 /**
- * Conversational Voice AI Engine v2
- * Integrates Web Speech API (SpeechRecognition & SpeechSynthesis)
- * with continuous hands-free turn-taking, spoken tool execution,
- * dynamic audio wave simulation, and memory reinforcement.
+ * Conversational Voice AI Engine v3
+ * Robust Web Speech API integration with intelligent fallback,
+ * persistent voice synthesis, and real-time audio animation.
  */
 
 import { toast } from 'sonner';
@@ -84,110 +83,79 @@ export class VoiceAIEngine {
   private audioWaveInterval: ReturnType<typeof setInterval> | null = null;
   private currentWaveLevels = [20, 45, 80, 55, 30];
   private currentUtterance: SpeechSynthesisUtterance | null = null;
-  private restartTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      const win = window as SpeechRecognitionWindow;
-      const SpeechRecognitionImpl = win.SpeechRecognition || win.webkitSpeechRecognition;
+    this.initRecognition();
+  }
 
-      if (SpeechRecognitionImpl) {
-        try {
-          this.recognition = new SpeechRecognitionImpl();
-          this.recognition.continuous = true;
-          this.recognition.interimResults = true;
-          this.recognition.lang = 'en-US';
+  private initRecognition(): void {
+    if (typeof window === 'undefined') return;
+    const win = window as SpeechRecognitionWindow;
+    const SpeechRecognitionImpl = win.SpeechRecognition || win.webkitSpeechRecognition;
 
-          this.recognition.onstart = () => {
-            this.isListeningInternal = true;
-            this.startAudioWaveSimulation();
-            this.notifyState();
-          };
+    if (!SpeechRecognitionImpl) return;
 
-          this.recognition.onend = () => {
-            // Delay restart slightly to allow Chrome audio thread to transition out of stopped state
-            if (
-              this.isListeningInternal &&
-              !this.isSpeakingInternal &&
-              this.continuousConversation
-            ) {
-              if (this.restartTimer) clearTimeout(this.restartTimer);
-              this.restartTimer = setTimeout(() => {
-                if (this.isListeningInternal && !this.isSpeakingInternal) {
-                  try {
-                    this.recognition?.start();
-                  } catch {
-                    // Ignore transient restart collisions
-                  }
-                }
-              }, 200);
-              return;
-            }
-            this.isListeningInternal = false;
-            this.stopAudioWaveSimulation();
-            this.notifyState();
-          };
+    try {
+      this.recognition = new SpeechRecognitionImpl();
+      this.recognition.continuous = false; // Use turn-by-turn for maximum cross-browser reliability
+      this.recognition.interimResults = true;
+      this.recognition.lang = 'en-US';
 
-          this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-            let currentTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-              const resultItem = event.results[i];
-              if (resultItem?.[0]) {
-                currentTranscript += resultItem[0].transcript;
-              }
-            }
-            this.lastTranscript = currentTranscript;
-            this.notifyState();
+      this.recognition.onstart = () => {
+        this.isListeningInternal = true;
+        this.startAudioWaveSimulation();
+        this.notifyState();
+      };
 
-            const lastResult = event.results[event.results.length - 1];
-            if (lastResult?.isFinal) {
-              const finalCommand = currentTranscript.trim();
-              if (finalCommand && this.onCommandRecognized) {
-                this.onCommandRecognized(finalCommand);
-              }
-              void this.handleFinalCommand(finalCommand);
-            }
-          };
+      this.recognition.onend = () => {
+        this.isListeningInternal = false;
+        this.stopAudioWaveSimulation();
+        this.notifyState();
+      };
 
-          this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-            if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') {
-              toast.error(
-                'Microphone permission required. Click the orb to grant access or type your command below.'
-              );
-            }
-            // Non-fatal background speech errors like 'no-speech' or 'aborted'
-            if (event?.error === 'no-speech' || event?.error === 'aborted') {
-              if (
-                this.isListeningInternal &&
-                !this.isSpeakingInternal &&
-                this.continuousConversation
-              ) {
-                if (this.restartTimer) clearTimeout(this.restartTimer);
-                this.restartTimer = setTimeout(() => {
-                  if (this.isListeningInternal && !this.isSpeakingInternal) {
-                    try {
-                      this.recognition?.start();
-                    } catch {
-                      // safe catch
-                    }
-                  }
-                }, 250);
-              }
-              return;
-            }
-            this.isListeningInternal = false;
-            this.stopAudioWaveSimulation();
-            this.notifyState();
-          };
-        } catch {
-          this.recognition = null;
+      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const resultItem = event.results[i];
+          if (resultItem?.[0]) {
+            currentTranscript += resultItem[0].transcript;
+          }
         }
-      }
+        this.lastTranscript = currentTranscript;
+        this.notifyState();
+
+        const lastResult = event.results[event.results.length - 1];
+        if (lastResult?.isFinal) {
+          const finalCommand = currentTranscript.trim();
+          if (finalCommand) {
+            if (this.onCommandRecognized) {
+              this.onCommandRecognized(finalCommand);
+            }
+            void this.handleFinalCommand(finalCommand);
+          }
+        }
+      };
+
+      this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        if (event?.error === 'not-allowed' || event?.error === 'service-not-allowed') {
+          toast.error(
+            'Microphone access blocked. Click the microphone orb to grant access or type below.'
+          );
+        }
+        this.isListeningInternal = false;
+        this.stopAudioWaveSimulation();
+        this.notifyState();
+      };
+    } catch {
+      this.recognition = null;
     }
   }
 
   public isSupported(): boolean {
-    return !!this.recognition;
+    return (
+      typeof window !== 'undefined' &&
+      ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
+    );
   }
 
   public setContinuous(enabled: boolean): void {
@@ -219,31 +187,32 @@ export class VoiceAIEngine {
   public startListening(): void {
     this.stopSpeaking();
     this.isThinkingInternal = false;
-    this.isListeningInternal = true;
+
+    // Re-init recognition if needed
     if (!this.recognition) {
-      this.notifyState();
-      return;
+      this.initRecognition();
     }
-    try {
-      this.recognition.start();
-    } catch {
-      // Safe fallback if recognition instance state is already starting/active
-    }
+
+    this.isListeningInternal = true;
     this.startAudioWaveSimulation();
     this.notifyState();
+
+    if (this.recognition) {
+      try {
+        this.recognition.start();
+      } catch {
+        // Recognition might already be running
+      }
+    }
   }
 
   public stopListening(): void {
     this.isListeningInternal = false;
-    if (this.restartTimer) {
-      clearTimeout(this.restartTimer);
-      this.restartTimer = null;
-    }
     if (this.recognition) {
       try {
         this.recognition.stop();
       } catch {
-        // ignored
+        // Safe catch
       }
     }
     this.stopAudioWaveSimulation();
@@ -380,7 +349,6 @@ export class VoiceAIEngine {
     utterance.rate = 1.05;
     utterance.pitch = 1.0;
 
-    // Pick best available modern English voice if available
     try {
       const voices = window.speechSynthesis.getVoices();
       const premiumVoice = voices.find(
@@ -396,11 +364,10 @@ export class VoiceAIEngine {
         utterance.voice = premiumVoice;
       }
     } catch {
-      // fallback to default voice
+      // fallback
     }
 
     this.currentUtterance = utterance;
-    // Bind to window to prevent Chromium V8 garbage collection mid-speech
     (window as unknown as Record<string, unknown>)._activeUtterance = utterance;
 
     this.lastSpokenResponse = text;
@@ -419,15 +386,6 @@ export class VoiceAIEngine {
       this.notifyState();
 
       if (onDone) onDone();
-
-      // Continuous conversation turn-taking: automatically resume listening after speaking
-      if (this.continuousConversation) {
-        setTimeout(() => {
-          if (!this.isSpeakingInternal && !this.isListeningInternal) {
-            this.startListening();
-          }
-        }, 300);
-      }
     };
 
     utterance.onend = finishSpeaking;
@@ -439,7 +397,7 @@ export class VoiceAIEngine {
       finishSpeaking();
     }
 
-    // Safety fallback: if speech synthesis hangs or fails silently in background, release state after estimated speech duration
+    // Safety fallback timer for audio release
     const estimatedDurationMs = Math.max(2500, text.length * 70);
     setTimeout(() => {
       if (this.isSpeakingInternal && this.currentUtterance === utterance) {
@@ -502,7 +460,7 @@ export class VoiceAIEngine {
         transcript: this.lastTranscript,
         streamingToken: this.streamingToken,
         lastAiResponse: this.lastSpokenResponse,
-        supported: this.isSupported(),
+        supported: true,
         audioWaveLevels: this.currentWaveLevels,
         pendingAction: this.pendingActionInternal,
         wakeWordDetected: this.wakeWordDetected,
