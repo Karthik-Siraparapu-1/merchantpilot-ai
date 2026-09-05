@@ -154,6 +154,15 @@ export default function LandingPage() {
 
           {/* Right Action CTAs */}
           <div className="hidden sm:flex items-center gap-3">
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-slate-300 hover:text-white hover:bg-slate-900"
+              >
+                Sign In
+              </Button>
+            </Link>
             {user ? (
               <Link href="/dashboard">
                 <Button
@@ -164,25 +173,14 @@ export default function LandingPage() {
                 </Button>
               </Link>
             ) : (
-              <>
-                <Link href="/login">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-slate-300 hover:text-white hover:bg-slate-900"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button
-                    size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-md shadow-indigo-600/20"
-                  >
-                    Launch Workspace <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </>
+              <Link href="/register">
+                <Button
+                  size="sm"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-md shadow-indigo-600/20"
+                >
+                  Launch Workspace <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              </Link>
             )}
           </div>
 
@@ -290,13 +288,13 @@ export default function LandingPage() {
               Launch Workspace (14-Day Free Trial) <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/dashboard" className="w-full sm:w-auto">
+          <Link href="/login" className="w-full sm:w-auto">
             <Button
               size="lg"
               variant="outline"
               className="w-full sm:w-auto h-12 px-7 border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-sm"
             >
-              <Play className="mr-2 h-4 w-4 text-indigo-400 fill-indigo-400" /> Explore Live Command
+              <Play className="mr-2 h-4 w-4 text-indigo-400 fill-indigo-400" /> Sign In to Command
               Center
             </Button>
           </Link>
