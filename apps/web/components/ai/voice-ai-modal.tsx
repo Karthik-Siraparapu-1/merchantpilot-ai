@@ -181,7 +181,11 @@ export function VoiceAIModal({ open, onOpenChange }: VoiceAIModalProps) {
     voiceAI.setCommandHandler((cmd) => {
       handleSpokenCommand(cmd);
     });
-  }, [handleSpokenCommand]);
+
+    if (open) {
+      voiceAI.startListening();
+    }
+  }, [open, handleSpokenCommand]);
 
   const toggleMic = () => {
     if (voiceState.isListening) {
