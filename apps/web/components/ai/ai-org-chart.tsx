@@ -45,7 +45,7 @@ export function AIOrgChart() {
           <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">
             Merchant CEO
           </div>
-          <div className="text-[10px] text-muted-foreground">Karthik · Human Decision-Maker</div>
+          <div className="text-[10px] text-muted-foreground">Store Executive · Human Decision-Maker</div>
         </div>
 
         {/* Connector */}

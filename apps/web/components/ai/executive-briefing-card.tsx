@@ -31,7 +31,7 @@ export function ExecutiveBriefingCard({
   };
 
   const briefingText =
-    `${getGreeting()}, Karthik. Here is what happened since you were away. ` +
+    `${getGreeting()}, Executive. Here is what happened since you were away. ` +
     `Today's revenue is tracking up 12.4% at ₹2,42,800. ` +
     `Inventory risk is detected on 3 catalog items with 48 hours runway. ` +
     `Fraud shield isolated 1 suspicious proxy order. ` +
@@ -95,7 +95,7 @@ export function ExecutiveBriefingCard({
             </Badge>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            {getGreeting()}, Karthik.
+            {getGreeting()}, Executive.
           </h1>
           <p className="text-xs text-muted-foreground">
             Here is what happened across your commerce channels since you were away.

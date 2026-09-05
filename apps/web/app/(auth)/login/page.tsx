@@ -72,7 +72,7 @@ export default function LoginPage() {
               <Sparkles className="h-5 w-5" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">Welcome back, Karthik</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
           <CardDescription className="text-xs">
             Continue to MerchantPilot AI Command Center
           </CardDescription>
@@ -87,10 +87,10 @@ export default function LoginPage() {
               size="sm"
               className="text-xs h-9 font-normal flex items-center justify-center gap-1.5"
               onClick={() => {
-                setValue('email', 'karthik@merchantpilot.ai');
-                setValue('password', 'Password123!');
+                setValue('email', 'demo@merchantpilot.ai');
+                setValue('password', 'Demo@123!');
               }}
-              title="Autofill Karthik credentials"
+              title="Autofill Demo Credentials"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
                 <path
