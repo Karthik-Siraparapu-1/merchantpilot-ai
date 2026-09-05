@@ -30,7 +30,9 @@ export function DigitalCEOCockpit() {
               </Badge>
             </div>
             <CardDescription className="text-xs">
-              Macro operational orchestration across sales, stock, margin, and cash velocity
+              {mode === 'EXECUTIVE'
+                ? 'Macro operational orchestration across sales, stock, margin, and cash velocity'
+                : 'Sub-second tactical execution telemetry across worker threads, event queues, and agent guardrails'}
             </CardDescription>
           </div>
         </div>
@@ -62,89 +64,156 @@ export function DigitalCEOCockpit() {
 
           <div className="p-2.5 rounded-xl bg-background/80 border border-border/80 text-center font-mono min-w-[120px]">
             <span className="text-[10px] text-muted-foreground block uppercase">
-              Business Health
+              {mode === 'EXECUTIVE' ? 'Business Health' : 'System Telemetry'}
             </span>
-            <span className="text-xl font-bold text-primary">95/100</span>
+            <span className="text-xl font-bold text-primary">
+              {mode === 'EXECUTIVE' ? '95/100' : '100% Online'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* 4 CEO Pillar Telemetry Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
-        <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground uppercase">Revenue</span>
-            <span className="text-emerald-500 font-bold">Excellent</span>
+      {mode === 'EXECUTIVE' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
+          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Revenue</span>
+              <span className="text-emerald-500 font-bold">Excellent</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">₹2.42L / Day</div>
+            <span className="text-[10px] text-emerald-500 block">↑ 14% vs baseline</span>
           </div>
-          <div className="text-lg font-bold text-foreground">₹2.42L / Day</div>
-          <span className="text-[10px] text-emerald-500 block">↑ 14% vs baseline</span>
-        </div>
 
-        <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card space-y-1">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground uppercase">Inventory</span>
-            <span className="text-amber-500 font-bold">Needs Attention</span>
+          <div className="p-3.5 rounded-xl border border-amber-500/30 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Inventory</span>
+              <span className="text-amber-500 font-bold">Needs Attention</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">2 Low SKUs</div>
+            <span className="text-[10px] text-amber-500 block">Restock PO drafted</span>
           </div>
-          <div className="text-lg font-bold text-foreground">2 Low SKUs</div>
-          <span className="text-[10px] text-amber-500 block">Restock PO drafted</span>
-        </div>
 
-        <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground uppercase">Cash Flow</span>
-            <span className="text-emerald-500 font-bold">Healthy</span>
+          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Cash Flow</span>
+              <span className="text-emerald-500 font-bold">Healthy</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">38.2% Margin</div>
+            <span className="text-[10px] text-muted-foreground block">T+0 settlement 65%</span>
           </div>
-          <div className="text-lg font-bold text-foreground">38.2% Margin</div>
-          <span className="text-[10px] text-muted-foreground block">T+0 settlement 65%</span>
-        </div>
 
-        <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground uppercase">Next Week Projection</span>
-            <span className="text-primary font-bold">+18% Lift</span>
+          <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Next Week Projection</span>
+              <span className="text-primary font-bold">+18% Lift</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">₹16.4L Target</div>
+            <span className="text-[10px] text-primary block">96% confidence</span>
           </div>
-          <div className="text-lg font-bold text-foreground">₹16.4L Target</div>
-          <span className="text-[10px] text-primary block">96% confidence</span>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
+          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Worker Mesh</span>
+              <span className="text-indigo-400 font-bold">8 Agents</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">Active Mesh</div>
+            <span className="text-[10px] text-emerald-500 block">100% thread uptime</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Dispatch Latency</span>
+              <span className="text-emerald-500 font-bold">Sub-Second</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">14ms Avg</div>
+            <span className="text-[10px] text-emerald-500 block">Zero bottlenecks</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-border/70 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">Queue Depth</span>
+              <span className="text-emerald-500 font-bold">Healthy</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">0 Pending</div>
+            <span className="text-[10px] text-muted-foreground block">142 events / min</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-card space-y-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground uppercase">RLS Guardrails</span>
+              <span className="text-indigo-400 font-bold">Enforced</span>
+            </div>
+            <div className="text-lg font-bold text-foreground">Multi-Tenant</div>
+            <span className="text-[10px] text-indigo-400 block">0 Policy Violations</span>
+          </div>
+        </div>
+      )}
 
       {/* CEO Executive Summary & Guidance */}
       <div className="p-4 rounded-xl bg-background/80 border border-border/80 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-purple-500" />
-            Executive Synthesis & Strategic Directives
+            {mode === 'EXECUTIVE'
+              ? 'Executive Synthesis & Strategic Directives'
+              : 'Operator Telemetry & Event Mesh Execution'}
           </span>
           <Badge variant="secondary" className="text-[10px] font-mono">
-            Updated 5 mins ago
+            Updated 1 min ago
           </Badge>
         </div>
 
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Your business is performing in the top 5th percentile of consumer hardware brands on
-          checkout velocity. Customer acquisition costs (CAC) decreased 9% with WhatsApp VIP
-          engagement. To protect the ₹16.4L weekly GMV target, execute the 120-unit Wireless Mouse
-          replenishment and apply the +8% price lift on high-demand accessories.
+          {mode === 'EXECUTIVE'
+            ? 'Your business is performing in the top 5th percentile of consumer hardware brands on checkout velocity. Customer acquisition costs (CAC) decreased 9% with WhatsApp VIP engagement. To protect the ₹16.4L weekly GMV target, execute the 120-unit Wireless Mouse replenishment and apply the +8% price lift on high-demand accessories.'
+            : 'All 8 autonomous agent workers are actively synchronized via Redis pub/sub. Ingress fraud monitoring intercepted 2 high-risk orders with zero checkout friction. Stock reservation locks are atomically verified with zero race conditions across 42 active catalog SKUs.'}
         </p>
 
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <Button
-            size="sm"
-            onClick={() => router.push('/scenario-lab')}
-            className="h-8 text-xs gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-xs"
-          >
-            <span>Run Digital CEO Scenario</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Button>
+          {mode === 'EXECUTIVE' ? (
+            <>
+              <Button
+                size="sm"
+                onClick={() => router.push('/scenario-lab')}
+                className="h-8 text-xs gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-xs"
+              >
+                <span>Run Digital CEO Scenario</span>
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => router.push('/reports')}
-            className="h-8 text-xs gap-1.5"
-          >
-            <span>Generate Full Board Report</span>
-          </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push('/reports')}
+                className="h-8 text-xs gap-1.5"
+              >
+                <span>Generate Full Board Report</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                onClick={() => router.push('/ai-workforce')}
+                className="h-8 text-xs gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+              >
+                <span>Inspect AI Workforce Mesh</span>
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push('/audit-log')}
+                className="h-8 text-xs gap-1.5"
+              >
+                <span>View System Audit Ledger</span>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Card>
